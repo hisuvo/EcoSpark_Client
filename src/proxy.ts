@@ -27,13 +27,6 @@ const refreshTokenMiddleware = async (refreshToken: string) => {
 
 // Example of default export
 export async function proxy(request: NextRequest) {
-  console.log(
-    "getNesRefreshToken ->",
-    await getNewTokenWithRefreshToken(
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJxNDNSd2NlakY5cjAycVhsZXhPZWcySUdJUXcwdkI3cyIsInJvbGUiOiJNRU1CRVIiLCJuYW1lIjoiQW51cG9tIERhdHRhIiwiZW1haWwiOiJkYXR0YXN1dm83QGdtYWlsLmNvbSIsInN0YXR1cyI6IkFDVElWRSIsImlzRGVsZXRlZCI6ZmFsc2UsImVtYWlsVmVyaWZpZWQiOnRydWUsImlhdCI6MTc3NTcxNTg4MSwiZXhwIjoxNzc2MzIwNjgxfQ.CNtX_9y24CHs7QrhrcaVS8LBe2zZ5LzqX90MMn6Fq-c",
-    ),
-  );
-
   try {
     const { pathname } = request.nextUrl;
     const accessToken = request.cookies.get("accessToken")?.value;
