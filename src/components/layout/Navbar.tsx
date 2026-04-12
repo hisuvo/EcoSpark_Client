@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { useAuth } from "@/providers/AuthProvider";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,14 +26,9 @@ import {
 import { NAV_LINKS } from "@/lib/constants";
 
 export default function Navbar() {
-  const { user, isAuthenticated, logout } = useAuth();
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
   const [mobileOpen, setMobileOpen] = useState(false);
-
-  const handleLogout = async () => {
-    await logout();
-  };
 
   const getInitials = (name: string) => {
     return name
@@ -72,7 +66,7 @@ export default function Navbar() {
             </Link>
           ))}
 
-          {isAuthenticated && (
+          {/* {isAuthenticated && (
             <Link
               href="/dashboard"
               className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
@@ -83,87 +77,20 @@ export default function Navbar() {
             >
               Dashboard
             </Link>
-          )}
+          )} */}
         </nav>
 
         {/* Right Section */}
         <div className="flex items-center gap-2">
           {/* Theme Toggle */}
-          <Button variant="ghost" size="icon">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+          >
             <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
             <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
           </Button>
-
-          {/* Auth Section */}
-          {isAuthenticated && user ? (
-            <DropdownMenu>
-              {/* ✅ FIXED Trigger */}
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="relative h-9 w-9 rounded-full"
-                >
-                  <Avatar className="h-9 w-9">
-                    <AvatarFallback className="bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300">
-                      {getInitials(user.name)}
-                    </AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-
-              <DropdownMenuContent align="end" className="w-56">
-                <div className="flex items-center gap-2 p-2">
-                  <div className="flex flex-col space-y-0.5">
-                    <p className="text-sm font-medium">{user.name}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {user.email}
-                    </p>
-                  </div>
-                </div>
-
-                <DropdownMenuSeparator />
-
-                {/* ✅ FIXED Item */}
-                <DropdownMenuItem asChild>
-                  <Link href="/profile" className="flex items-center">
-                    <User className="mr-2 h-4 w-4" />
-                    My Profile
-                  </Link>
-                </DropdownMenuItem>
-
-                <DropdownMenuItem asChild>
-                  <Link href="/dashboard" className="flex items-center">
-                    <LayoutDashboard className="mr-2 h-4 w-4" />
-                    Dashboard
-                  </Link>
-                </DropdownMenuItem>
-
-                <DropdownMenuSeparator />
-
-                <DropdownMenuItem
-                  onClick={handleLogout}
-                  className="text-red-600"
-                >
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Logout
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            /* ✅ FIXED Buttons */
-            <div className="hidden md:flex items-center gap-2">
-              <Button variant="ghost" asChild>
-                <Link href="/login">Login</Link>
-              </Button>
-
-              <Button
-                asChild
-                className="bg-green-600 hover:bg-green-700 text-white"
-              >
-                <Link href="/register">Register</Link>
-              </Button>
-            </div>
-          )}
 
           {/* Mobile Menu */}
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
@@ -187,7 +114,7 @@ export default function Navbar() {
                   </Link>
                 ))}
 
-                {!isAuthenticated && (
+                {
                   <div className="flex flex-col gap-2 mt-4 pt-4 border-t">
                     <Button variant="outline" asChild>
                       <Link href="/login">Login</Link>
@@ -200,7 +127,7 @@ export default function Navbar() {
                       <Link href="/register">Register</Link>
                     </Button>
                   </div>
-                )}
+                }
               </nav>
             </SheetContent>
           </Sheet>

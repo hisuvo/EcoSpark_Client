@@ -1,6 +1,10 @@
+import { getUserInfo } from "@/services/auth.service";
 import Link from "next/link";
 
-export default function Home() {
+export default async function Home() {
+  const user = await getUserInfo();
+
+  console.log("this is user information ->", user);
   return (
     <div>
       {/* navigation menu add here */}

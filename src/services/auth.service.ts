@@ -2,6 +2,7 @@
 
 import { API_BASE_URL } from "@/lib/constants";
 import { setTokenCookie } from "@/lib/tokenUtils";
+import { cookies } from "next/headers";
 
 export const getNewTokenWithRefreshToken = async (refreshToken: string) => {
   try {
@@ -14,7 +15,7 @@ export const getNewTokenWithRefreshToken = async (refreshToken: string) => {
     });
 
     if (!response.ok) {
-      return false;
+      return { success: false };
     }
 
     const { data } = await response.json();
@@ -36,8 +37,51 @@ export const getNewTokenWithRefreshToken = async (refreshToken: string) => {
         60 * 60 * 24,
       );
     }
+
+    return {
+      success: true,
+      accessToken,
+      refreshToken: newRefreshToken,
+    };
   } catch (error) {
     console.error("Error refreshing token", error);
-    return false;
+    return { success: false };
   }
 };
+
+export async function getUserInfo() {
+  try {
+    const cookieStore = await cookies();
+
+    const accessToken = cookieStore.get("accessToken")?.value;
+    const sessionToken = cookieStore.get("better_auth.session_token")?.value;
+
+    if (!accessToken) {
+      return null;
+    }
+
+    const cookieHeader = `accessToken=${accessToken}${
+      sessionToken ? `; better-auth.session_token=${sessionToken}` : ""
+    }`;
+
+    const res = await fetch(`${API_BASE_URL}/auth/me`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Cookie: cookieHeader,
+      },
+    });
+
+    if (!res.ok) {
+      console.error("Failed to fetch user info:", res.status, res.statusText);
+      return null;
+    }
+
+    const { data } = await res.json();
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching user info:", error);
+    return null;
+  }
+}

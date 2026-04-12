@@ -53,6 +53,17 @@ export const loginAction = async (
       message: response.message,
     } as LoginResponse;
   } catch (error: unknown) {
+
+if (
+      error &&
+      typeof error === "object" &&
+      "digest" in error &&
+      typeof error.digest === "string" &&
+      error.digest.startsWith("NEXT_REDIRECT")
+    ) {
+      throw error;
+    }
+
     if (axios.isAxiosError(error)) {
       return {
         success: false,
