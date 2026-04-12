@@ -4,17 +4,20 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import QueryProviders from "@/provider/QueryProvider";
 import { ThemeProvider } from "@/provider/ThemeProvider";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  preload: false,
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  preload: false,
 });
 
 export const metadata: Metadata = {
@@ -30,6 +33,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={cn(
         "h-full",
         "antialiased",
@@ -41,7 +45,9 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <ThemeProvider>
-          <QueryProviders>{children}</QueryProviders>
+          <TooltipProvider>
+            <QueryProviders>{children}</QueryProviders>
+          </TooltipProvider>
         </ThemeProvider>
       </body>
     </html>
