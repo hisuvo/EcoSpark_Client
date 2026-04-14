@@ -1,3 +1,6 @@
+import DashboardNavbar from "@/components/module/Dashboard/DashboardNavbar";
+import DashboardSidebar from "@/components/module/Dashboard/DashboardSidebar";
+
 export default function DashboardLayout({
   children,
 }: {
@@ -5,9 +8,9 @@ export default function DashboardLayout({
 }) {
   return (
     <div className="">
-      <div>Dashboard Menubar</div>
+      <DashboardNavbar />
       <div className="flex w-full flex-1 min-h-[calc(100vh-4rem)]">
-        <div>Dashboard Sidebar</div>
+        <DashboardSidebar />
         {children}
       </div>
     </div>

@@ -1,10 +1,7 @@
 import { NavSection } from "@/type/dashboard.type";
 import { UserRole } from "@/type/role.type";
-import { getDefaultDashboardRoute } from "./authUtils";
 
-export const getCommonNavItems = (role: UserRole): NavSection[] => {
-  const defaultDeshboard = getDefaultDashboardRoute(role);
-
+export const getCommonNavItems = (): NavSection[] => {
   return [
     {
       items: [
@@ -14,19 +11,19 @@ export const getCommonNavItems = (role: UserRole): NavSection[] => {
           icon: "Home",
         },
         {
-          label: "Dashboard",
-          href: defaultDeshboard,
-          icon: "LayoutDashboard",
-        },
-        {
           label: "My Profile",
           href: "/my-profile",
           icon: "User",
         },
       ],
     },
+  ];
+};
+
+const getSettingsNavItems = (): NavSection[] => {
+  return [
     {
-      title: "setting",
+      title: "Settings",
       items: [
         {
           label: "Change Password",
@@ -90,14 +87,16 @@ export const MemberNavItems: NavSection[] = [
 ];
 
 export const getNavItemsByRole = (role: UserRole) => {
-  const commonNavItems = getCommonNavItems(role);
+  const commonNavItems = getCommonNavItems();
+  const settingsNavItems = getSettingsNavItems();
+
   switch (role) {
     case "ADMIN":
-      return [...commonNavItems, AdminNavItems];
+      return [...commonNavItems, ...AdminNavItems, ...settingsNavItems];
     case "MEMBER":
-      return [...commonNavItems, MemberNavItems];
+      return [...commonNavItems, ...MemberNavItems, ...settingsNavItems];
     case "COMMON":
-      return [...commonNavItems, commonNavItems];
+      return commonNavItems;
     default:
       return [];
   }
