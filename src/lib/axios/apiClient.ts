@@ -42,11 +42,17 @@ const axiosInstance = async () => {
     await tryRefreshToken(accessToken, refreshToken);
   }
 
+  const cookieHeader = cookieStore
+    .getAll()
+    .map((cookie) => `${cookie.name}=${cookie.value}`)
+    .join("; ");
+
   const instance = axios.create({
     baseURL: API_BASE_URL,
     withCredentials: true,
     headers: {
       "Content-Type": "application/json",
+      Cookie: cookieHeader,
     },
   });
 
@@ -134,7 +140,7 @@ const httpDelete = async <TData>(
 ): Promise<ApiResponse<TData>> => {
   try {
     const instance = await axiosInstance();
-    const response = await instance.get<ApiResponse<TData>>(endPoint, {
+    const response = await instance.delete<ApiResponse<TData>>(endPoint, {
       params: option?.params,
       headers: option?.headers,
     });

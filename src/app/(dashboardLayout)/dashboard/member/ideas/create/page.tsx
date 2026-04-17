@@ -1,5 +1,7 @@
-import React from "react";
+import CreateIdea from "@/components/module/Member/CreateIdea";
 
 export default function MemberCreateIdeaPage() {
-  return <div>Member create Idea page it</div>;
+  return <div>
+    <CreateIdea />
+  </div>;
 }

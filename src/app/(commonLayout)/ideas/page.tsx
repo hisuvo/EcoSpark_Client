@@ -68,10 +68,9 @@ export default function GetAllIdeasPage() {
   const ideasList = data?.data?.data || [];
   const meta = data?.data?.meta;
   const totalPages =
-    meta?.totalPage ||
-    meta?.totalPages ||
-    Math.ceil((meta?.total || 0) / limit) ||
-    1;
+    meta?.totalPage || Math.ceil((meta?.total || 0) / limit) || 1;
+
+  console.log("this is ideaList", ideasList);
 
   return (
     <div className="container py-10 space-y-8">

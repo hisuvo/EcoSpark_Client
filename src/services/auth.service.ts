@@ -1,5 +1,6 @@
 "use server";
 
+import { httpClient } from "@/lib/axios/apiClient";
 import { API_BASE_URL } from "@/lib/constants";
 import { setTokenCookie } from "@/lib/tokenUtils";
 import { cookies } from "next/headers";
@@ -81,3 +82,18 @@ export async function getUserInfo() {
     return null;
   }
 }
+
+import { ApiResponse } from "@/type/api.type";
+
+export const changePasswordService = async (payload: {
+  currentPassword: string;
+  newPassword: string;
+}): Promise<ApiResponse<any>> => {
+  try {
+    const response = await httpClient.post<any>("/auth/change-password", payload);
+    return response;
+  } catch (error) {
+    console.error("Error changing password:", error);
+    throw error;
+  }
+};

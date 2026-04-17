@@ -1,19 +1,33 @@
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
-import { DollarSign, Link as LinkIcon, MessageSquare, ThumbsDown, ThumbsUp } from 'lucide-react'
-import Link from 'next/link'
-import { IIdea } from '@/type/idea.type'
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
+import {
+  DollarSign,
+  Link as LinkIcon,
+  MessageSquare,
+  ThumbsDown,
+  ThumbsUp,
+} from "lucide-react";
+import Link from "next/link";
+import { IIdea } from "@/type/idea.type";
+import Image from "next/image";
 
-const IdeaCard = ({idea}: {idea: IIdea}) => {
+const IdeaCard = ({ idea }: { idea: IIdea }) => {
   return (
     <Card className="group overflow-hidden hover:shadow-lg transition-all duration-300 flex flex-col h-full">
       {/* Image */}
       <div className="relative h-48 overflow-hidden bg-muted">
         {idea.imageUrl ? (
-          <img
+          <Image
             src={idea.imageUrl}
             alt={idea.title}
+            width={500}
+            height={500}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
         ) : (
@@ -74,7 +88,7 @@ const IdeaCard = ({idea}: {idea: IIdea}) => {
         </Button>
       </CardFooter>
     </Card>
-  )
-}
+  );
+};
 
-export default IdeaCard 
+export default IdeaCard;

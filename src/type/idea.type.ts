@@ -27,12 +27,17 @@ export interface IIdea {
 }
 
 export interface ICreateIdeaPayload {
-  title: string;
-  description: string;
-  categoryId: string;
-  isPremium?: boolean;
-  price?: number;
+    title: string;
+    problem: string;
+    solution: string;
+    description: string;
+    imageUrl?: string | undefined;
+    isPaid?: boolean | undefined;
+    price?: number | undefined;
+    categoryId: string;
+    status?: IdeaStatus;
 }
+
 
 export interface IUpdateIdeaPayload {
   title?: string;

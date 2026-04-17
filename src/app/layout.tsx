@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import QueryProviders from "@/provider/QueryProvider";
 import { ThemeProvider } from "@/provider/ThemeProvider";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { Toaster } from "@/components/ui/sonner";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -47,6 +48,7 @@ export default function RootLayout({
         <ThemeProvider>
           <TooltipProvider>
             <QueryProviders>{children}</QueryProviders>
+            <Toaster position="top-center" />
           </TooltipProvider>
         </ThemeProvider>
       </body>

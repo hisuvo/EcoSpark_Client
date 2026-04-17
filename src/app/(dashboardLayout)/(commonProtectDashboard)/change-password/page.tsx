@@ -1,5 +1,10 @@
-import React from "react";
+
+import ChangePasswordForm from "@/components/module/Auth/ChangePassword";
 
 export default function ChangePasswordPage() {
-  return <div>changle password page it</div>;
+  return (
+    <>
+      <ChangePasswordForm />
+    </>
+  );
 }
