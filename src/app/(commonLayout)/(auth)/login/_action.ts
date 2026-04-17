@@ -27,7 +27,7 @@ export const loginAction = async (
 
       if (accessToken) await setTokenCookie("accessToken", accessToken);
       if (refreshToken) await setTokenCookie("refreshToken", refreshToken);
-      if (token) await setTokenCookie("better_auth.session_token", token);
+      if (token) await setTokenCookie("better-auth.session_token", token);
 
       const { email, emailVerified, role, needPasswordChange } = user;
 
@@ -53,8 +53,7 @@ export const loginAction = async (
       message: response.message,
     } as LoginResponse;
   } catch (error: unknown) {
-
-if (
+    if (
       error &&
       typeof error === "object" &&
       "digest" in error &&

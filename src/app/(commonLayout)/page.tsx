@@ -1,9 +1,17 @@
-import Link from "next/link";
+import SearchBar from "@/components/module/Home/SearchBar";
+import HeroBanner from "../../components/module/Home/HeroBanner";
+import Testimonials from "@/components/module/Home/Testimonial";
+import FeaturedIdeas from "@/components/module/Home/FeaturedIdeas";
+import NewsletterForm from "@/components/module/Home/NewsletterForm";
 
 export default async function Home() {
   return (
-    <div className="h-[calc(100vh-64px)]">
-      home page it
-    </div>
+    <>
+      <HeroBanner />
+      <SearchBar />
+      <FeaturedIdeas />
+      <Testimonials />
+      <NewsletterForm />
+    </>
   );
 }

@@ -54,21 +54,17 @@ export async function getUserInfo() {
     const cookieStore = await cookies();
 
     const accessToken = cookieStore.get("accessToken")?.value;
-    const sessionToken = cookieStore.get("better_auth.session_token")?.value;
+    const sessionToken = cookieStore.get("better-auth.session_token")?.value;
 
     if (!accessToken) {
       return null;
     }
 
-    const cookieHeader = `accessToken=${accessToken}${
-      sessionToken ? `; better-auth.session_token=${sessionToken}` : ""
-    }`;
-
     const res = await fetch(`${API_BASE_URL}/auth/me`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Cookie: cookieHeader,
+        Cookie: `accessToken=${accessToken}; better-auth.session_token=${sessionToken}`,
       },
     });
 
