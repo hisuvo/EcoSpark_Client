@@ -7,7 +7,7 @@ export default function DashboardRootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="h-screen flex flex-col overflow-hidden">
+    <div className="fixed inset-0 flex flex-col">
       {/* Fixed Navbar */}
       <DashboardNavbar />
 
