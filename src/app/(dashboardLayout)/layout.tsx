@@ -7,11 +7,16 @@ export default function DashboardRootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="">
+    <div className="h-screen flex flex-col overflow-hidden">
+      {/* Fixed Navbar */}
       <DashboardNavbar />
-      <div className="flex w-full flex-1 min-h-[calc(100vh-4rem)]">
+
+      <div className="flex flex-1 overflow-hidden">
+        {/* Fixed Sidebar */}
         <DashboardSidebar />
-        <div className="flex-1 w-full overflow-x-hidden p-4">{children}</div>
+
+        {/* Scrollable Content */}
+        <div className="flex-1 overflow-y-auto p-4">{children}</div>
       </div>
     </div>
   );

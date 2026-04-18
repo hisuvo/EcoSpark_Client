@@ -110,7 +110,7 @@ export default function MyIdeas() {
             <TableBody>
               {ideas.map((idea) => (
                 <TableRow key={idea.id}>
-                  <TableCell className="font-medium max-w-[200px] truncate">
+                  <TableCell className="font-medium max-w-50 truncate">
                     {idea.title}
                   </TableCell>
                   <TableCell className="hidden md:table-cell">
