@@ -44,11 +44,11 @@ export default function RootLayout({
         inter.variable,
       )}
     >
-      <body className="min-h-full flex flex-col overflow-hidden">
+      <body className="min-h-full flex flex-col">
         <ThemeProvider>
           <TooltipProvider>
             <QueryProviders>{children}</QueryProviders>
-            <Toaster position="top-right" />
+            <Toaster richColors position="top-center" />
           </TooltipProvider>
         </ThemeProvider>
       </body>

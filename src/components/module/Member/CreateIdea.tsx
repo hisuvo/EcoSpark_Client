@@ -89,8 +89,6 @@ export default function CreateIdeaPage() {
       price: 0,
     },
     onSubmit: async ({ value }) => {
-      console.log("create idea ->", value);
-
       const payload = {
         title: value.title,
         problem: value.problem,

@@ -12,11 +12,13 @@ export default function DashboardRootLayout({
       <DashboardNavbar />
 
       <div className="flex flex-1 overflow-hidden">
-        {/* Fixed Sidebar */}
-        <DashboardSidebar />
+        {/* Fixed Sidebar - Hidden on mobile */}
+        <div className="hidden md:block">
+          <DashboardSidebar />
+        </div>
 
         {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto p-4">{children}</div>
+        <div className="flex-1 overflow-y-auto p-2 md:p-4">{children}</div>
       </div>
     </div>
   );

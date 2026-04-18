@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
 import { httpClient } from "@/lib/axios/apiClient";
@@ -83,17 +84,48 @@ export async function getUserInfo() {
   }
 }
 
-import { ApiResponse } from "@/type/api.type";
+import { ApiErrorResponse } from "@/type/api.type";
+import {
+  ChangePasswordResponse,
+  ChangePasswordSuccessResponse,
+} from "@/type/auth.type";
 
 export const changePasswordService = async (payload: {
   currentPassword: string;
   newPassword: string;
-}): Promise<ApiResponse<any>> => {
+}): Promise<ChangePasswordResponse> => {
   try {
-    const response = await httpClient.post<any>("/auth/change-password", payload);
-    return response;
-  } catch (error) {
+    const response = await httpClient.post<ChangePasswordSuccessResponse>(
+      "/auth/change-password",
+      payload,
+    );
+
+    if (response.success) {
+      const { accessToken, refreshToken, token } = response.data;
+
+      await setTokenCookie("accessToken", accessToken);
+      await setTokenCookie("refreshToken", refreshToken);
+      await setTokenCookie("better-auth.session_token", token);
+
+      return response;
+    }
+    return {
+      ...(typeof response.data === "object" ? response.data : {}),
+      success: response.success,
+      message: response.message,
+    } as ApiErrorResponse;
+  } catch (error: any) {
     console.error("Error changing password:", error);
-    throw error;
+
+    // Handle axios error response
+    if (error?.response?.data) {
+      throw new Error(
+        error.response.data.message || "Failed to change password",
+      );
+    }
+
+    throw new Error(
+      error?.message || "An error occurred while changing password",
+    );
   }
 };

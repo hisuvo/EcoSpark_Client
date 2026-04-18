@@ -16,6 +16,7 @@ import { useForm } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 import z from "zod";
 
 const ChangePasswordSchema = z
@@ -29,9 +30,12 @@ const ChangePasswordSchema = z
     path: ["confirmPassword"],
   });
 
-const ChangePasswordForm = () => {
-  const [error, setError] = useState<string | null>(null);
+type ChangePasswordPayload = {
+  currentPassword: string;
+  newPassword: string;
+};
 
+const ChangePasswordForm = () => {
   const [show, setShow] = useState({
     current: false,
     new: false,
@@ -39,8 +43,19 @@ const ChangePasswordForm = () => {
   });
 
   const mutation = useMutation({
-    mutationFn: (payload: z.infer<typeof ChangePasswordSchema>) =>
+    mutationFn: (payload: ChangePasswordPayload) =>
       changePasswordService(payload),
+    onSuccess: (data) => {
+      toast.success(data?.message || "Password changed successfully!");
+      // Reset form fields
+      form.reset();
+      // Clear password visibility toggles
+      setShow({ current: false, new: false, confirm: false });
+    },
+    onError: (error: any) => {
+      const errorMsg = error?.message || "Failed to change password";
+      toast.error(errorMsg);
+    },
   });
 
   const form = useForm({
@@ -50,11 +65,9 @@ const ChangePasswordForm = () => {
       confirmPassword: "",
     },
     onSubmit: async ({ value }) => {
-      try {
-        await mutation.mutateAsync(value);
-      } catch (error: any) {
-        setError(`Change password failed: ${error.message}`);
-      }
+      const { currentPassword, newPassword } = value;
+      const payload = { currentPassword, newPassword };
+      await mutation.mutateAsync(payload);
     },
   });
 
@@ -146,17 +159,6 @@ const ChangePasswordForm = () => {
               </AppSubmitButton>
             )}
           </form.Subscribe>
-
-          {/* Errors */}
-          {mutation.isError && (
-            <p className="text-red-500 text-sm text-center">
-              {mutation.error instanceof Error
-                ? mutation.error.message
-                : "Something went wrong"}
-            </p>
-          )}
-
-          {error && <p className="text-red-500 text-sm text-center">{error}</p>}
         </form>
       </CardContent>
     </Card>

@@ -35,7 +35,7 @@ const DashboardNavbarContent = ({
   }, []);
 
   return (
-    <div className="flex w-full h-16 items-center border-b">
+    <div className="flex w-full h-16 items-center border-b bg-card sticky top-0 z-50">
       {/* Mobile menu Toggle button (Mobile only) */}
       <div className="flex items-center px-4 md:hidden">
         <Sheet open={isOpen && isMobile} onOpenChange={setIsOpen}>
@@ -45,7 +45,7 @@ const DashboardNavbarContent = ({
             </Button>
           </SheetTrigger>
 
-          <SheetContent side="left" className="p-0">
+          <SheetContent side="left" className="p-0 w-64">
             <DashboardMobileSidebar
               userInfo={userInfo}
               navItems={navItems}
@@ -63,7 +63,7 @@ const DashboardNavbarContent = ({
       </div>
 
       {/* Main Navbar Content (Search and Actions) */}
-      <div className="flex flex-1 items-center justify-between px-4 h-full gap-4">
+      <div className="flex flex-1 items-center justify-between px-2 md:px-4 h-full gap-4">
         {/* search Component */}
         <div className="flex-1 flex items-center">
           <div className="relative w-full hidden sm:block">
@@ -77,7 +77,7 @@ const DashboardNavbarContent = ({
         </div>
 
         {/* Right side Actions */}
-        <div className="flex items-center gap-3 md:gap-4">
+        <div className="flex items-center gap-2 md:gap-4">
           <UserDropdown userInfo={userInfo} />
         </div>
       </div>
