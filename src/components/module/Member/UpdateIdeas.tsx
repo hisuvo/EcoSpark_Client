@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { z } from "zod";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useForm } from "@tanstack/react-form";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -23,36 +23,79 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { Loader2, ArrowLeft, X } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Loader2, ArrowLeft, AlertCircle, X, UploadCloud } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
+
 import { getCategories } from "@/services/categories.service";
-import { IdeaStatus } from "@/type/idea.type";
-import { createIdea } from "@/services/idea.service";
-import { useForm } from "@tanstack/react-form";
+import { getIdeaById, updateIdea } from "@/services/idea.service";
 import { ICategory } from "@/type/category.type";
 import AppField from "@/shared/form/AppField";
-import AppSubmitButton from "@/shared/form/AppSubmitButton";
 import { ApiResponse } from "@/type/api.type";
 import Image from "next/image";
 import { uploadImage } from "@/lib/uploadImage";
+import { useRef, useState } from "react";
 
-export const ideaSchema = z.object({
-  title: z.string().min(5, "Title must be at least 5 characters"),
-  problem: z.string().min(20, "Problem must be at least 20 characters"),
-  solution: z.string().min(20, "Solution must be at least 20 characters"),
-  description: z.string().min(30, "Description must be at least 30 characters"),
-  imageUrl: z.string().optional(),
-  categoryId: z.string().min(1, "Please select a category"),
-  isPaid: z.boolean().default(false),
-  price: z.coerce.number().optional(),
+export const updateIdeaSchema = z.object({
+  title: z.string().min(5).optional(),
+
+  problem: z
+    .string()
+    .min(20)
+    .optional()
+    .or(z.literal(""))
+    .transform((val) => (val === "" ? undefined : val)),
+
+  solution: z
+    .string()
+    .min(20)
+    .optional()
+    .or(z.literal(""))
+    .transform((val) => (val === "" ? undefined : val)),
+
+  description: z
+    .string()
+    .min(30)
+    .optional()
+    .or(z.literal(""))
+    .transform((val) => (val === "" ? undefined : val)),
+
+  imageUrl: z
+    .string()
+    .url()
+    .optional()
+    .or(z.literal(""))
+    .transform((val) => (val === "" ? undefined : val)),
+
+  categoryId: z
+    .string()
+    .min(1)
+    .optional()
+    .or(z.literal(""))
+    .transform((val) => (val === "" ? undefined : val)),
+
+  isPaid: z.boolean().optional(),
+
+  price: z.coerce.number().min(0).optional(),
 });
 
-export default function CreateIdeaPage() {
+export default function UpdateIdeas() {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+
   const router = useRouter();
-  const [submitStatus, setSubmitStatus] = useState<IdeaStatus>("UNDER_REVIEW");
+  const params = useParams();
+  const id = params.id as string;
+  const queryClient = useQueryClient();
+
+  const { data: ideaResponse, isLoading: ideaLoading } = useQuery({
+    queryKey: ["idea", id],
+    queryFn: () => getIdeaById(id),
+  });
+
+  const idea = ideaResponse?.data;
 
   const { data: categoriesResponse } = useQuery<ApiResponse<ICategory[]>>({
     queryKey: ["categories"],
@@ -61,36 +104,35 @@ export default function CreateIdeaPage() {
 
   const categories = categoriesResponse?.data || [];
 
-  const createMutation = useMutation({
-    mutationFn: (data: any) => createIdea(data),
+  const updateMutation = useMutation({
+    mutationFn: (data: any) => updateIdea(id, data),
     onSuccess: () => {
-      toast.success("Idea created successfully!");
+      queryClient.invalidateQueries({ queryKey: ["my-ideas"] });
+      queryClient.invalidateQueries({ queryKey: ["idea", id] });
+      toast.success("Idea updated successfully!");
       router.push("/dashboard/member/ideas");
     },
     onError: (error: any) => {
-      console.error("Create idea error:", error);
       const errorMsg =
         error?.response?.data?.message ||
         error.message ||
-        "Failed to create idea";
+        "Failed to update idea";
       toast.error(errorMsg);
     },
   });
 
   const form = useForm({
     defaultValues: {
-      title: "",
-      problem: "",
-      solution: "",
-      description: "",
-      imageUrl: "",
-      categoryId: "",
-      isPaid: false,
-      price: 0,
+      title: idea?.title || "",
+      problem: idea?.problem || "",
+      solution: idea?.solution || "",
+      description: idea?.description || "",
+      imageUrl: idea?.imageUrl || "",
+      categoryId: idea?.categoryId || "",
+      isPaid: idea?.isPaid || false,
+      price: idea?.price || 0,
     },
     onSubmit: async ({ value }) => {
-      console.log("create idea ->", value);
-
       const payload = {
         title: value.title,
         problem: value.problem,
@@ -99,36 +141,109 @@ export default function CreateIdeaPage() {
         categoryId: value.categoryId,
       } as any;
 
-      // Only add imageUrl if it's not empty
       if (value.imageUrl?.trim()) {
         payload.imageUrl = value.imageUrl;
       }
 
-      // Only add isPaid and price if it's a paid idea
       if (value.isPaid && value.price && value.price > 0) {
         payload.isPaid = true;
         payload.price = value.price;
       }
 
-      await createMutation.mutateAsync(payload as any);
+      console.log("Update payload:", JSON.stringify(payload, null, 2));
+      await updateMutation.mutateAsync(payload);
     },
   });
+
+  if (ideaLoading) {
+    return (
+      <div className="max-w-3xl mx-auto space-y-6">
+        <Skeleton className="h-10 w-48" />
+        <Card>
+          <CardContent className="pt-6">
+            <div className="space-y-4">
+              <Skeleton className="h-12 w-full" />
+              <Skeleton className="h-24 w-full" />
+              <Skeleton className="h-24 w-full" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!idea) {
+    return (
+      <div className="max-w-3xl mx-auto space-y-6">
+        <Button variant="ghost" asChild>
+          <Link href="/dashboard/member/ideas">
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to My Ideas
+          </Link>
+        </Button>
+        <Card>
+          <CardContent className="pt-6 text-center">
+            <AlertCircle className="h-8 w-8 mx-auto mb-2 text-red-500" />
+            <p className="text-lg text-muted-foreground">Idea not found</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  const canEdit = idea.status === "DRAFT" || idea.status === "REJECTED";
+
+  if (!canEdit) {
+    return (
+      <div className="max-w-3xl mx-auto space-y-6">
+        <Button variant="ghost" asChild>
+          <Link href="/dashboard/member/ideas">
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to My Ideas
+          </Link>
+        </Button>
+        <Alert className="border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/20">
+          <AlertCircle className="h-4 w-4 text-amber-600" />
+          <AlertDescription className="text-amber-800 dark:text-amber-300">
+            This idea cannot be edited because it is currently{" "}
+            <strong>
+              {idea.status === "UNDER_REVIEW"
+                ? "under review"
+                : idea.status === "APPROVED"
+                  ? "approved"
+                  : "rejected"}
+            </strong>
+            . Only draft and rejected ideas can be edited.
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <Button variant="ghost" asChild>
-        <Link href="/dashboard/member/ideas" className="flex items-center">
+        <Link href="/dashboard/member/ideas">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to My Ideas
         </Link>
       </Button>
 
+      {idea.status === "REJECTED" && idea.feedback && (
+        <Alert className="border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950/20">
+          <AlertCircle className="h-4 w-4 text-red-600" />
+          <AlertDescription className="text-red-800 dark:text-red-300">
+            <strong>Admin Feedback:</strong> {idea.feedback}
+          </AlertDescription>
+        </Alert>
+      )}
+
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">Create New Idea</CardTitle>
+          <CardTitle className="text-2xl">Edit Idea</CardTitle>
           <CardDescription>
-            Share your sustainability idea with the community. You can save it
-            as a draft or submit it for review.
+            Update your idea and resubmit it for review. Status:{" "}
+            <strong>{idea.status}</strong>
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -145,7 +260,7 @@ export default function CreateIdeaPage() {
               name="title"
               validators={{
                 onChange: ({ value }) => {
-                  const result = ideaSchema.shape.title.safeParse(value);
+                  const result = updateIdeaSchema.shape.title.safeParse(value);
                   return result.success
                     ? undefined
                     : result.error.issues[0].message;
@@ -166,7 +281,8 @@ export default function CreateIdeaPage() {
               name="categoryId"
               validators={{
                 onChange: ({ value }) => {
-                  const result = ideaSchema.shape.categoryId.safeParse(value);
+                  const result =
+                    updateIdeaSchema.shape.categoryId.safeParse(value);
                   return result.success
                     ? undefined
                     : result.error.issues[0].message;
@@ -205,7 +321,8 @@ export default function CreateIdeaPage() {
               name="problem"
               validators={{
                 onChange: ({ value }) => {
-                  const result = ideaSchema.shape.problem.safeParse(value);
+                  const result =
+                    updateIdeaSchema.shape.problem.safeParse(value);
                   return result.success
                     ? undefined
                     : result.error.issues[0].message;
@@ -240,7 +357,8 @@ export default function CreateIdeaPage() {
               name="solution"
               validators={{
                 onChange: ({ value }) => {
-                  const result = ideaSchema.shape.solution.safeParse(value);
+                  const result =
+                    updateIdeaSchema.shape.solution.safeParse(value);
                   return result.success
                     ? undefined
                     : result.error.issues[0].message;
@@ -275,7 +393,8 @@ export default function CreateIdeaPage() {
               name="description"
               validators={{
                 onChange: ({ value }) => {
-                  const result = ideaSchema.shape.description.safeParse(value);
+                  const result =
+                    updateIdeaSchema.shape.description.safeParse(value);
                   return result.success
                     ? undefined
                     : result.error.issues[0].message;
@@ -310,7 +429,8 @@ export default function CreateIdeaPage() {
               name="imageUrl"
               validators={{
                 onChange: ({ value }) => {
-                  const result = ideaSchema.shape.imageUrl.safeParse(value);
+                  const result =
+                    updateIdeaSchema.shape.imageUrl.safeParse(value);
                   return result.success
                     ? undefined
                     : result.error.issues[0].message;
@@ -335,7 +455,7 @@ export default function CreateIdeaPage() {
                             if (!file) return;
 
                             try {
-                              setUploading(true); // start loading
+                              setUploading(true); // ✅ start loading
 
                               const url = await uploadImage(file);
 
@@ -343,7 +463,7 @@ export default function CreateIdeaPage() {
                                 field.handleChange(url);
                               }
                             } finally {
-                              setUploading(false); // stop loading
+                              setUploading(false); // ✅ stop loading
                             }
                           }}
                         />
@@ -431,7 +551,8 @@ export default function CreateIdeaPage() {
                     name="price"
                     validators={{
                       onChange: ({ value }) => {
-                        const result = ideaSchema.shape.price.safeParse(value);
+                        const result =
+                          updateIdeaSchema.shape.price.safeParse(value);
                         return result.success
                           ? undefined
                           : result.error.issues[0].message;
@@ -459,32 +580,16 @@ export default function CreateIdeaPage() {
                 selector={(state) => [state.canSubmit, state.isSubmitting]}
               >
                 {([canSubmit]) => (
-                  <>
-                    <Button
-                      type="submit"
-                      variant="outline"
-                      className="flex-1"
-                      disabled={!canSubmit || createMutation.isPending}
-                      onClick={() => setSubmitStatus("DRAFT")}
-                    >
-                      {createMutation.isPending && submitStatus === "DRAFT" ? (
-                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                      ) : null}
-                      Save as Draft
-                    </Button>
-                    <Button
-                      type="submit"
-                      className="flex-1 bg-green-600 hover:bg-green-700 text-white"
-                      disabled={!canSubmit || createMutation.isPending}
-                      onClick={() => setSubmitStatus("UNDER_REVIEW")}
-                    >
-                      {createMutation.isPending &&
-                      submitStatus === "UNDER_REVIEW" ? (
-                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                      ) : null}
-                      Submit for Review
-                    </Button>
-                  </>
+                  <Button
+                    type="submit"
+                    className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                    disabled={!canSubmit || updateMutation.isPending}
+                  >
+                    {updateMutation.isPending ? (
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    ) : null}
+                    Update Idea
+                  </Button>
                 )}
               </form.Subscribe>
             </div>

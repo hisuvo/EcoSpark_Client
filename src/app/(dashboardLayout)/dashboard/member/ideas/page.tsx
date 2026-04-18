@@ -1,9 +1,12 @@
-import React from 'react'
+import MyIdeas from "@/components/module/Member/MyIdeas";
+import React from "react";
 
 const MyIdeasPage = () => {
   return (
-    <div>MyIdeasPage</div>
-  )
-}
+    <div>
+      <MyIdeas />
+    </div>
+  );
+};
 
-export default MyIdeasPage
+export default MyIdeasPage;
