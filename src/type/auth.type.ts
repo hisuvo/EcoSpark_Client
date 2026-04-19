@@ -1,3 +1,4 @@
+import { ApiErrorResponse } from "./api.type";
 import { IUser } from "./user.type";
 
 export type LoginSuccessResponse = {
@@ -14,3 +15,16 @@ export type LoginErrorResponse = {
 };
 
 export type LoginResponse = LoginSuccessResponse | LoginErrorResponse;
+
+export interface ChangePasswordSuccessResponse {
+  success: boolean;
+  message: string;
+  token: string;
+  accessToken: string;
+  refreshToken: string;
+  user: IUser;
+}
+
+export type ChangePasswordResponse =
+  | ChangePasswordSuccessResponse
+  | ApiErrorResponse;

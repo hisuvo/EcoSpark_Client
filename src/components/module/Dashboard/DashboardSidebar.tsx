@@ -13,12 +13,12 @@ export default async function DashboardSidebar() {
   const dashboardHome = getDefaultDashboardRoute(userInfo.role as UserRole);
 
   return (
-    <div className="w-64 h-full border-r">
+    <>
       <DashboardSidebarContent
         userInfo={userInfo}
         navItems={navItems}
         DashboardHome={dashboardHome}
       />
-    </div>
+    </>
   );
 }

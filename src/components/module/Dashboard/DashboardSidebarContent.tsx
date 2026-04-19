@@ -6,6 +6,7 @@ import { getIconComponents } from "@/lib/IconMapper";
 import { cn } from "@/lib/utils";
 import { NavSection } from "@/type/dashboard.type";
 import { IUser } from "@/type/user.type";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -22,9 +23,9 @@ const DashboardSidebarContent = ({
 }: DashboardSidebarContentProps) => {
   const pathname = usePathname();
   return (
-    <div className="hidden md:flex h-[calc(100vh-4rem)] w-64 flex-col border-r bg-card sticky top-16">
+    <div className="hidden md:flex h-[calc(100vh-4rem)] w-64 flex-col border-r bg-card sticky top-16 z-40">
       {/* Navigation area */}
-      <div className="flex-1 overflow-hidden px-3">
+      <div className="flex-1 overflow-hidden px-3 pr-2">
         <ScrollArea className="h-full">
           <nav className="space-y-6 pt-4">
             {navItems.map((section, sectionId) => (
@@ -72,8 +73,10 @@ const DashboardSidebarContent = ({
       <div className="flex items-center gap-3 border-t p-4 mt-auto">
         <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden border">
           {userInfo.image ? (
-            <img
+            <Image
               src={userInfo.image}
+              width={50}
+              height={50}
               alt={userInfo.name}
               className="h-full w-full object-cover"
             />

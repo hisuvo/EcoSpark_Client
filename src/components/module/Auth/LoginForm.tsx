@@ -127,12 +127,6 @@ export default function LoginForm({ redirectpath }: LoginFormProps) {
             </Link>
           </div>
 
-          {error && (
-            <Alert variant={"destructive"}>
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-
           <form.Subscribe
             selector={(state) => [state.canSubmit, state.isSubmitting]}
           >

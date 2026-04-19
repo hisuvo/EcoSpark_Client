@@ -8,20 +8,32 @@ import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
+import { useMutation } from "@tanstack/react-query";
+import {
+  IRegisterPayload,
+  RegisterAction,
+} from "@/app/(commonLayout)/(auth)/register/_action";
+import AppSubmitButton from "@/shared/form/AppSubmitButton";
+import { toast } from "sonner";
 
 // Zod Schema
 const registerSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  email: z.string().email("Invalid email"),
+  name: z
+    .string("Name is required")
+    .trim()
+    .min(3, "Name must be at least 3 characters long"),
+  email: z.string("Email is required").trim().email("Invalid email address"),
   password: z
-    .string()
-    .min(6, "Minimum 6 characters")
-    .regex(/[A-Z]/, "Must include uppercase letter")
-    .regex(/[0-9]/, "Must include a number"),
+    .string("Password is required")
+    .min(6, "Password must be at least 6 characters long"),
 });
 
 export default function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
+
+  const registerMutation = useMutation({
+    mutationFn: (payload: IRegisterPayload) => RegisterAction(payload),
+  });
 
   const form = useForm({
     defaultValues: {
@@ -30,7 +42,17 @@ export default function RegisterForm() {
       password: "",
     },
     onSubmit: async ({ value }) => {
-      console.log("Register Data ->", value);
+      try {
+        const response = await registerMutation.mutateAsync(value);
+
+        if (!response.success) {
+          toast.error(response.message || "Login failed!");
+        }
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (error: any) {
+        toast.error(`Login failed : ${error.message}`);
+      }
     },
   });
 
@@ -112,7 +134,7 @@ export default function RegisterForm() {
                   variant={"ghost"}
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-[32px] text-sm text-muted-foreground"
+                  className="absolute right-3 top-8 text-sm text-muted-foreground"
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </Button>
@@ -120,12 +142,34 @@ export default function RegisterForm() {
             )}
           </form.Field>
 
-          <button
-            type="submit"
-            className="w-full bg-black text-white py-2 rounded-md"
+          <form.Subscribe
+            selector={(state) => [state.canSubmit, state.isSubmitting]}
           >
-            Register
-          </button>
+            {([canSubmit]) => (
+              <AppSubmitButton
+                isSubmitting={registerMutation.isPending}
+                loadingText="Registation process..."
+                disabled={!canSubmit || registerMutation.isPending}
+                className="w-full"
+              >
+                Register
+              </AppSubmitButton>
+            )}
+          </form.Subscribe>
+
+          {registerMutation.isError && (
+            <p className="text-red-500 text-sm text-center">
+              {registerMutation.error instanceof Error
+                ? registerMutation.error.message
+                : "An error occurred"}
+            </p>
+          )}
+
+          {registerMutation.data && !registerMutation.data.success && (
+            <p className="text-red-500 text-sm text-center">
+              {registerMutation.data.message}
+            </p>
+          )}
         </form>
       </CardContent>
 
