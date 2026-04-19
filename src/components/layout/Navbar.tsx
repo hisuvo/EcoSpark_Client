@@ -26,6 +26,7 @@ import {
 import { NAV_LINKS } from "@/lib/constants";
 import { IUser } from "@/type/user.type";
 import Image from "next/image";
+import LogoutButton from "../module/Auth/LogoutButton";
 
 export default function Navbar({ user }: { user: IUser }) {
   const pathname = usePathname();
@@ -148,10 +149,9 @@ export default function Navbar({ user }: { user: IUser }) {
                   </div>
 
                   <div className="border-t p-1">
-                    <button className="flex w-full items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50">
-                      <LogOut className="h-4 w-4" />
-                      Logout
-                    </button>
+                    <div className="w-full">
+                      <LogoutButton />
+                    </div>
                   </div>
                 </div>
               )}

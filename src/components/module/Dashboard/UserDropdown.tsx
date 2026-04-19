@@ -3,6 +3,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { IUser } from "@/type/user.type";
 import { Key, LogOut, User } from "lucide-react";
 import Link from "next/link";
+import LogoutButton from "../Auth/LogoutButton";
 
 interface UserDropdownProps {
    userInfo: IUser
@@ -47,11 +48,8 @@ const UserDropdown = ({userInfo}: UserDropdownProps) => {
 
         <DropdownMenuSeparator/>
 
-        <DropdownMenuItem className="cursor-pointer text-red-500">
-          <Link href="/logout" className="flex items-center gap-2">
-          <LogOut className="w-4 h-4 mr-2" />
-            Logout
-          </Link>
+        <DropdownMenuItem asChild className="cursor-pointer">
+          <LogoutButton />
         </DropdownMenuItem>
     </DropdownMenuContent>
         </DropdownMenu>

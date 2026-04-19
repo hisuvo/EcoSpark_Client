@@ -135,11 +135,13 @@ interface VerifyEmailResponse {
 }
 
 interface VerifyEmailPayload {
-  email:string,
+  email: string;
   otp: string;
 }
 
-export const verifyEmailService = async (payload: VerifyEmailPayload): Promise<VerifyEmailResponse> => {
+export const verifyEmailService = async (
+  payload: VerifyEmailPayload,
+): Promise<VerifyEmailResponse> => {
   try {
     const response = await httpClient.post<VerifyEmailResponse>(
       "/auth/verify-email",
@@ -158,5 +160,29 @@ export const verifyEmailService = async (payload: VerifyEmailPayload): Promise<V
     throw new Error(
       error?.message || "An error occurred while verifying email",
     );
+  }
+};
+
+export const logoutService = async (): Promise<void> => {
+  try {
+    // Call logout API to invalidate tokens on backend
+    await fetch(`${API_BASE_URL}/auth/logout`, {
+      method: "POST",
+      credentials: "include",
+    });
+  } catch (error) {
+    console.error("Error during logout:", error);
+  } finally {
+    // Clear all auth cookies regardless of API response
+    const cookieStore = await cookies();
+    const authCookies = [
+      "accessToken",
+      "refreshToken",
+      "better-auth.session_token",
+    ];
+
+    authCookies.forEach((cookieName) => {
+      cookieStore.delete(cookieName);
+    });
   }
 };
