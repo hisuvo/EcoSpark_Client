@@ -47,7 +47,9 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <ThemeProvider>
           <TooltipProvider>
-            <QueryProviders>{children}</QueryProviders>
+            <QueryProviders>
+              <main className="flex-1">{children}</main>
+            </QueryProviders>
             <Toaster richColors position="top-center" />
           </TooltipProvider>
         </ThemeProvider>

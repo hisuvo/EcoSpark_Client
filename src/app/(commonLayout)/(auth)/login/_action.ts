@@ -32,7 +32,7 @@ export const loginAction = async (
       const { email, emailVerified, role, needPasswordChange } = user;
 
       if (!emailVerified) {
-        redirect("/verify-email");
+        redirect(`/verify-email?email=${email}`);
       } else if (needPasswordChange) {
         redirect(`/reset-password?email=${email}`);
       } else {
@@ -64,9 +64,22 @@ export const loginAction = async (
     }
 
     if (axios.isAxiosError(error)) {
+      const errorMessage = error.response?.data?.message || "Login failed";
+      const userEmail = payload.email;
+
+      // Check if email is not verified - redirect to verify page
+      if (
+        errorMessage.toLowerCase().includes("email") &&
+        (errorMessage.toLowerCase().includes("not verify") ||
+          errorMessage.toLowerCase().includes("verify") ||
+          errorMessage.toLowerCase().includes("verified"))
+      ) {
+        redirect(`/verify-email?email=${userEmail}`);
+      }
+
       return {
         success: false,
-        message: error.response?.data?.message || "Login failed",
+        message: errorMessage,
       };
     }
     return {

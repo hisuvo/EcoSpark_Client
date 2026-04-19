@@ -5,6 +5,11 @@ import { httpClient } from "@/lib/axios/apiClient";
 import { API_BASE_URL } from "@/lib/constants";
 import { setTokenCookie } from "@/lib/tokenUtils";
 import { cookies } from "next/headers";
+import { ApiErrorResponse } from "@/type/api.type";
+import {
+  ChangePasswordResponse,
+  ChangePasswordSuccessResponse,
+} from "@/type/auth.type";
 
 export const getNewTokenWithRefreshToken = async (refreshToken: string) => {
   try {
@@ -84,12 +89,6 @@ export async function getUserInfo() {
   }
 }
 
-import { ApiErrorResponse } from "@/type/api.type";
-import {
-  ChangePasswordResponse,
-  ChangePasswordSuccessResponse,
-} from "@/type/auth.type";
-
 export const changePasswordService = async (payload: {
   currentPassword: string;
   newPassword: string;
@@ -126,6 +125,38 @@ export const changePasswordService = async (payload: {
 
     throw new Error(
       error?.message || "An error occurred while changing password",
+    );
+  }
+};
+
+interface VerifyEmailResponse {
+  success: boolean;
+  message: string;
+}
+
+interface VerifyEmailPayload {
+  email:string,
+  otp: string;
+}
+
+export const verifyEmailService = async (payload: VerifyEmailPayload): Promise<VerifyEmailResponse> => {
+  try {
+    const response = await httpClient.post<VerifyEmailResponse>(
+      "/auth/verify-email",
+      payload,
+    );
+
+    return response;
+  } catch (error: any) {
+    console.error("Error verifying email:", error);
+
+    // Handle axios error response
+    if (error?.response?.data) {
+      throw new Error(error.response.data.message || "Failed to verify email");
+    }
+
+    throw new Error(
+      error?.message || "An error occurred while verifying email",
     );
   }
 };
