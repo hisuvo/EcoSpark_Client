@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
 import { httpClient } from "@/lib/axios/apiClient";
@@ -11,12 +10,9 @@ import {
 
 export const getIdeas = async (params?: Record<string, unknown>) => {
   try {
-    const response = await httpClient.get<ApiResponse<IIdea[]>>(
-      "/ideas",
-      {
-        params,
-      },
-    );
+    const response = await httpClient.get<ApiResponse<IIdea[]>>("/ideas", {
+      params,
+    });
     return response;
   } catch (error) {
     console.error("Error fetching ideas:", error);

@@ -53,7 +53,7 @@ export default function LoginForm({ redirectpath }: LoginFormProps) {
   });
 
   return (
-    <Card className="max-w-md mx-auto mt-10 border p-6 rounded-lg">
+    <Card className="max-w-md mx-auto my-10 border p-6 rounded-lg">
       <CardTitle className="text-xl font-semibold mb-4">Login</CardTitle>
 
       <CardContent>

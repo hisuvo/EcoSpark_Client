@@ -9,7 +9,7 @@ export default async function HomeLayout({
 }) {
   const user = await getUserInfo();
   return (
-    <div className="min-h-full flex flex-col">
+    <div className="min-h-screen flex flex-col">
       <Navbar user={user} />
       <main className="flex-1">{children}</main>
       <Footer />

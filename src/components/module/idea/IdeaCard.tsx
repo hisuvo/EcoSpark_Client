@@ -84,7 +84,7 @@ const IdeaCard = ({ idea }: { idea: IIdea }) => {
           className="text-green-600 hover:text-green-700 hover:bg-green-50 dark:hover:bg-green-950/50"
           asChild
         >
-          <Link href={`/idea/${idea.id}`}>View Idea</Link>
+          <Link href={`/ideas/${idea.id}`}>View Idea</Link>
         </Button>
       </CardFooter>
     </Card>

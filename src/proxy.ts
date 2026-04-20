@@ -8,11 +8,68 @@ import {
 } from "@/lib/authUtils";
 import { NextRequest, NextResponse } from "next/server";
 import { UserRole } from "./type/role.type";
+import { isTokenExpiringSoon } from "./lib/tokenUtils";
+import { performHeadlessTokenRefresh } from "./lib/auth/refresh-token";
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const accessToken = request.cookies.get("accessToken")?.value;
+  const refreshToken = request.cookies.get("refreshToken")?.value;
+  const sessionToken = request.cookies.get("better-auth.session_token")?.value;
+
+  // 0. Token Refresh Logic
+  if (accessToken && refreshToken && (await isTokenExpiringSoon(accessToken))) {
+    const newData = await performHeadlessTokenRefresh(
+      refreshToken,
+      sessionToken,
+    );
+
+    if (newData) {
+      const response = NextResponse.next();
+
+      // Update cookies in the response
+      if (newData.accessToken) {
+        const tokenPayload = jwtUtils.decodeToken(newData.accessToken);
+        const expiresIn =
+          (tokenPayload.exp as number) - Math.floor(Date.now() / 1000);
+
+        response.cookies.set("accessToken", newData.accessToken, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "strict",
+          path: "/",
+          maxAge: expiresIn,
+        });
+      }
+
+      if (newData.refreshToken) {
+        const refreshPayload = jwtUtils.decodeToken(newData.refreshToken);
+        const refreshExpiresIn =
+          (refreshPayload.exp as number) - Math.floor(Date.now() / 1000);
+
+        response.cookies.set("refreshToken", newData.refreshToken, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "strict",
+          path: "/",
+          maxAge: refreshExpiresIn,
+        });
+      }
+
+      if (newData.sessionToken) {
+        response.cookies.set("better-auth.session_token", newData.sessionToken, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "strict",
+          path: "/",
+          maxAge: 60 * 60 * 24,
+        });
+      }
+
+      return response;
+    }
+  }
 
   let decodedToken: any = null;
 
@@ -61,5 +118,6 @@ export const config = {
     "/dashboard/:path*",
     "/my-profile",
     "/change-password",
+    "/ideas", // Added to ensure ideas page can also trigger refresh
   ],
 };

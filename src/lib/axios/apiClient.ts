@@ -3,24 +3,7 @@ import { API_BASE_URL } from "../constants";
 import { ApiRequestOptions, ApiResponse } from "@/type/api.type";
 import { cookies, headers } from "next/headers";
 import { isTokenExpiringSoon } from "../tokenUtils";
-import { getNewTokenWithRefreshToken } from "@/services/auth.service";
 
-const tryRefreshToken = async (accessToken: string, refreshToken: string) => {
-  if (!isTokenExpiringSoon(accessToken)) {
-    return;
-  }
-
-  const responseHeaders = await headers();
-  if (responseHeaders.get("x-refresh-token") === "1") {
-    return;
-  }
-
-  try {
-    await getNewTokenWithRefreshToken(refreshToken);
-  } catch (error) {
-    console.error("Error refreshing token in http client", error);
-  }
-};
 
 const logHttpError = (method: string, endPoint: string, error: unknown) => {
   if (axios.isAxiosError(error)) {
@@ -36,11 +19,6 @@ const logHttpError = (method: string, endPoint: string, error: unknown) => {
 const axiosInstance = async () => {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get("accessToken")?.value;
-  const refreshToken = cookieStore.get("refreshToken")?.value;
-
-  if (accessToken && refreshToken) {
-    await tryRefreshToken(accessToken, refreshToken);
-  }
 
   const cookieHeader = cookieStore
     .getAll()

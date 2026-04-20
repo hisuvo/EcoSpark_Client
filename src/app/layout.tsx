@@ -44,12 +44,10 @@ export default function RootLayout({
         inter.variable,
       )}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-screen flex flex-col">
         <ThemeProvider>
           <TooltipProvider>
-            <QueryProviders>
-              <main className="flex-1">{children}</main>
-            </QueryProviders>
+            <QueryProviders>{children}</QueryProviders>
             <Toaster richColors position="top-center" />
           </TooltipProvider>
         </ThemeProvider>

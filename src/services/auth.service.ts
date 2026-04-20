@@ -11,23 +11,20 @@ import {
   ChangePasswordSuccessResponse,
 } from "@/type/auth.type";
 
+import { performHeadlessTokenRefresh } from "@/lib/auth/refresh-token";
+
 export const getNewTokenWithRefreshToken = async (refreshToken: string) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/auth/refresh-token`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Cookie: `refreshToken=${refreshToken}`,
-      },
-    });
+    const cookieStore = await cookies();
+    const sessionToken = cookieStore.get("better-auth.session_token")?.value;
 
-    if (!response.ok) {
+    const data = await performHeadlessTokenRefresh(refreshToken, sessionToken);
+
+    if (!data) {
       return { success: false };
     }
 
-    const { data } = await response.json();
-
-    const { accessToken, refreshToken: newRefreshToken, sessionToken } = data;
+    const { accessToken, refreshToken: newRefreshToken, sessionToken: newSessionToken } = data;
 
     if (accessToken) {
       await setTokenCookie("accessToken", accessToken);
@@ -37,10 +34,10 @@ export const getNewTokenWithRefreshToken = async (refreshToken: string) => {
       await setTokenCookie("refreshToken", newRefreshToken);
     }
 
-    if (sessionToken) {
+    if (newSessionToken) {
       await setTokenCookie(
         "better-auth.session_token",
-        sessionToken,
+        newSessionToken,
         60 * 60 * 24,
       );
     }

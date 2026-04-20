@@ -1,12 +1,6 @@
 "use server";
 
-import {
-  getDefaultDashboardRoute,
-  isValideRedirectForRole,
-} from "@/lib/authUtils";
 import { httpClient } from "@/lib/axios/apiClient";
-import { setTokenCookie } from "@/lib/tokenUtils";
-import { UserRole } from "@/type/role.type";
 import { IUser } from "@/type/user.type";
 import axios from "axios";
 import { redirect } from "next/navigation";
