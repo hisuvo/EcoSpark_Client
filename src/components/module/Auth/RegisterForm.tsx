@@ -28,11 +28,16 @@ const registerSchema = z.object({
     .min(6, "Password must be at least 6 characters long"),
 });
 
-export default function RegisterForm() {
+interface RegisterFormProps {
+  redirectpath?: string;
+}
+
+export default function RegisterForm({ redirectpath }: RegisterFormProps) {
   const [showPassword, setShowPassword] = useState(false);
 
   const registerMutation = useMutation({
-    mutationFn: (payload: IRegisterPayload) => RegisterAction(payload),
+    mutationFn: (payload: IRegisterPayload) =>
+      RegisterAction(payload, redirectpath),
   });
 
   const form = useForm({

@@ -1,13 +1,14 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import IdeaCard from "@/components/module/idea/IdeaCard";
 import { Spinner } from "@/components/ui/spinner";
-import { getIdeas } from "@/services/idea.service";
-import { useQuery } from "@tanstack/react-query";
-import { useDebounce } from "@/hooks/useDebounce";
 import { Input } from "@/components/ui/input";
+import { useDebounce } from "@/hooks/useDebounce";
+import { useIdeas } from "@/hooks/useIdeas";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+
 import {
   Select,
   SelectContent,
@@ -15,195 +16,163 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
 
 export default function GetAllIdeasPage() {
   const [searchTerm, setSearchTerm] = useState("");
-  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+  const debouncedSearch = useDebounce(searchTerm, 500);
 
   const [page, setPage] = useState(1);
-  const [limit] = useState(5);
+  const limit = 6;
+
   const [sortBy, setSortBy] = useState("createdAt");
   const [sortOrder, setSortOrder] = useState("desc");
 
-  // Reset to page 1 when search or sorting changes
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const [approvedOnly, setApprovedOnly] = useState(false);
+
+  // memo params
+  const params = useMemo(
+    () => ({
+      page,
+      limit,
+      sortBy,
+      sortOrder,
+      ...(debouncedSearch && { searchTerm: debouncedSearch }),
+      ...(approvedOnly && { status: "APPROVED" }), // backend filter
+    }),
+    [page, limit, sortBy, sortOrder, debouncedSearch, approvedOnly],
+  );
+
+  console.log("user memo inside params ->", params);
+
+  const { data, isLoading, isError } = useIdeas(params);
+
+  const ideas = data?.data ?? [];
+  const meta = data?.meta;
+  const totalPages = Math.ceil((meta?.total || 0) / limit);
+
+  // handlers
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
     setPage(1);
   };
-  const handleSortByChange = (val: string) => {
+
+  const handleSortBy = (val: string) => {
     setSortBy(val);
     setPage(1);
   };
-  const handleSortOrderChange = (val: string) => {
+
+  const handleSortOrder = (val: string) => {
     setSortOrder(val);
     setPage(1);
   };
 
-  const params: Record<string, unknown> = {
-    page,
-    limit,
-    sortBy,
-    sortOrder,
+  const toggleApproved = () => {
+    setApprovedOnly((prev) => !prev);
+    setPage(1);
   };
 
-  if (debouncedSearchTerm) {
-    params.searchTerm = debouncedSearchTerm;
-  }
-
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ["ideas", params],
-    queryFn: () => getIdeas(params),
-  });
-
-  const ideasList = data?.data?.data || [];
-  const meta = data?.data?.meta;
-  const totalPages =
-    meta?.totalPage || Math.ceil((meta?.total || 0) / limit) || 1;
-
-  console.log("this is ideaList", ideasList);
-
   return (
-    <div className="container py-10 space-y-8">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div className="container mx-auto py-10 space-y-8">
+      {/* Header */}
+      <div className="flex flex-col lg:flex-row justify-between gap-4">
         <h1 className="text-3xl font-bold text-green-700">Explore Ideas</h1>
 
-        <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+        <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+          {/* Search */}
           <Input
             placeholder="Search ideas..."
             value={searchTerm}
-            onChange={handleSearchChange}
-            className="sm:w-[300px]"
+            onChange={handleSearch}
+            className="sm:w-[250px]"
           />
 
-          <div className="flex gap-2">
-            <Select value={sortBy} onValueChange={handleSortByChange}>
-              <SelectTrigger className="w-[140px]">
-                <SelectValue placeholder="Sort By" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="createdAt">Date Created</SelectItem>
-                <SelectItem value="title">Title</SelectItem>
-                <SelectItem value="price">Price</SelectItem>
-              </SelectContent>
-            </Select>
+          {/* Sort By */}
+          <Select value={sortBy} onValueChange={handleSortBy}>
+            <SelectTrigger className="w-[150px]">
+              <SelectValue placeholder="Sort By" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="createdAt">Date</SelectItem>
+              <SelectItem value="title">Title</SelectItem>
+              <SelectItem value="_count.votes">Votes</SelectItem>
+            </SelectContent>
+          </Select>
 
-            <Select value={sortOrder} onValueChange={handleSortOrderChange}>
-              <SelectTrigger className="w-[110px]">
-                <SelectValue placeholder="Order" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="desc">Descending</SelectItem>
-                <SelectItem value="asc">Ascending</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          {/* Sort Order */}
+          <Select value={sortOrder} onValueChange={handleSortOrder}>
+            <SelectTrigger className="w-[130px]">
+              <SelectValue placeholder="Order" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="desc">Desc</SelectItem>
+              <SelectItem value="asc">Asc</SelectItem>
+            </SelectContent>
+          </Select>
+
+          {/* Approved Filter */}
+          <Button
+            variant={approvedOnly ? "default" : "outline"}
+            onClick={toggleApproved}
+          >
+            {approvedOnly ? "Approved Only" : "All Ideas"}
+          </Button>
         </div>
       </div>
 
+      {/* Active Filters */}
+      <div className="flex gap-2 flex-wrap">
+        {approvedOnly && <Badge variant="secondary">Approved</Badge>}
+        {debouncedSearch && (
+          <Badge variant="secondary">Search: {debouncedSearch}</Badge>
+        )}
+      </div>
+
+      {/* Loading */}
       {isLoading ? (
-        <div className="flex flex-col items-center justify-center py-20">
-          <Spinner data-icon="inline-start" className="size-8" />
-          <p className="mt-4 text-muted-foreground">Loading ideas...</p>
+        <div className="flex justify-center py-20">
+          <Spinner className="size-8" />
         </div>
       ) : isError ? (
-        <div className="flex justify-center py-20 text-destructive text-lg">
-          Error loading ideas. Please try again later.
+        <div className="text-center py-20 text-destructive">
+          Failed to load ideas
         </div>
-      ) : ideasList.length > 0 ? (
+      ) : ideas.length > 0 ? (
         <>
+          {/* Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {ideasList.map((idea: any) => (
+            {ideas.map((idea) => (
               <IdeaCard key={idea.id} idea={idea} />
             ))}
           </div>
 
+          {/* Pagination */}
           {totalPages > 1 && (
-            <div className="pt-8 w-full max-w-lg mx-auto">
-              <Pagination>
-                <PaginationContent>
-                  <PaginationItem>
-                    <PaginationPrevious
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        if (page > 1) setPage((p) => p - 1);
-                      }}
-                      className={
-                        page === 1 ? "pointer-events-none opacity-50" : ""
-                      }
-                    />
-                  </PaginationItem>
+            <div className="flex justify-center items-center gap-3 pt-6">
+              <Button
+                variant="outline"
+                disabled={page === 1}
+                onClick={() => setPage((p) => p - 1)}
+              >
+                Prev
+              </Button>
 
-                  {Array.from({ length: totalPages }).map((_, i) => {
-                    const pageNumber = i + 1;
-                    if (
-                      pageNumber === 1 ||
-                      pageNumber === totalPages ||
-                      (pageNumber >= page - 1 && pageNumber <= page + 1)
-                    ) {
-                      return (
-                        <PaginationItem key={pageNumber}>
-                          <PaginationLink
-                            href="#"
-                            isActive={page === pageNumber}
-                            onClick={(e) => {
-                              e.preventDefault();
-                              setPage(pageNumber);
-                            }}
-                          >
-                            {pageNumber}
-                          </PaginationLink>
-                        </PaginationItem>
-                      );
-                    }
+              <span className="text-sm text-muted-foreground">
+                Page {page} of {totalPages}
+              </span>
 
-                    if (
-                      (pageNumber === 2 && page > 3) ||
-                      (pageNumber === totalPages - 1 && page < totalPages - 2)
-                    ) {
-                      return (
-                        <PaginationItem key={`ellipsis-${pageNumber}`}>
-                          <PaginationEllipsis />
-                        </PaginationItem>
-                      );
-                    }
-                    return null;
-                  })}
-
-                  <PaginationItem>
-                    <PaginationNext
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        if (page < totalPages) setPage((p) => p + 1);
-                      }}
-                      className={
-                        page === totalPages
-                          ? "pointer-events-none opacity-50"
-                          : ""
-                      }
-                    />
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
+              <Button
+                variant="outline"
+                disabled={page === totalPages}
+                onClick={() => setPage((p) => p + 1)}
+              >
+                Next
+              </Button>
             </div>
           )}
         </>
       ) : (
-        <div className="text-center py-20 bg-muted/30 rounded-lg border border-dashed">
-          <p className="text-muted-foreground text-lg">
-            No ideas found matching your criteria.
-          </p>
+        <div className="text-center py-20 text-muted-foreground">
+          No ideas found
         </div>
       )}
     </div>

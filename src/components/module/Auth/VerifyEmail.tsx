@@ -26,6 +26,7 @@ export default function VerifyEmail() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const email = searchParams.get("email");
+  const redirect = searchParams.get("redirect");
 
   // Safety redirect if email is missing
   useEffect(() => {
@@ -43,7 +44,8 @@ export default function VerifyEmail() {
     onSuccess: (data) => {
       if (data.success) {
         toast.success(data.message || "Verification successful!");
-        router.push("/login");
+        const loginRedirect = redirect ? `?redirect=${redirect}` : "/login";
+        router.push(loginRedirect);
       } else {
         toast.error(data.message || "Verification failed");
       }

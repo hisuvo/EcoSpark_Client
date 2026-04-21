@@ -26,18 +26,26 @@ export interface IIdea {
   };
 }
 
-export interface ICreateIdeaPayload {
-    title: string;
-    problem: string;
-    solution: string;
-    description: string;
-    imageUrl?: string | undefined;
-    isPaid?: boolean | undefined;
-    price?: number | undefined;
-    categoryId: string;
-    status?: IdeaStatus;
+export interface IIdeaResponse {
+  data: IIdea[];
+  meta?: {
+    total: number;
+    page: number;
+    limit: number;
+  };
 }
 
+export interface ICreateIdeaPayload {
+  title: string;
+  problem: string;
+  solution: string;
+  description: string;
+  imageUrl?: string | undefined;
+  isPaid?: boolean | undefined;
+  price?: number | undefined;
+  categoryId: string;
+  status?: IdeaStatus;
+}
 
 export interface IUpdateIdeaPayload {
   title?: string;

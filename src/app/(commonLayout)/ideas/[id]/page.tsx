@@ -1,9 +1,12 @@
-import React from "react";
+import IdeaDetails from "@/components/module/idea/IdeaDetails";
+import { getUserInfo } from "@/services/auth.service";
 
-const IdeaDetailPage = () => {
+const IdeaDetailPage = async () => {
+  const userInfo = await getUserInfo();
+
   return (
     <div>
-      <h2>This is single idea page</h2>
+      <IdeaDetails user={userInfo} />
     </div>
   );
 };

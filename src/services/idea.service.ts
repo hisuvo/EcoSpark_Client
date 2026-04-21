@@ -5,15 +5,21 @@ import { ApiResponse } from "@/type/api.type";
 import {
   ICreateIdeaPayload,
   IIdea,
+  IIdeaResponse,
   IUpdateIdeaPayload,
 } from "@/type/idea.type";
 
-export const getIdeas = async (params?: Record<string, unknown>) => {
+export const getIdeas = async (
+  params?: Record<string, unknown>,
+): Promise<IIdeaResponse> => {
   try {
     const response = await httpClient.get<ApiResponse<IIdea[]>>("/ideas", {
       params,
     });
-    return response;
+    return {
+      data: response.data.data,
+      meta: response.data.meta,
+    };
   } catch (error) {
     console.error("Error fetching ideas:", error);
     throw error;

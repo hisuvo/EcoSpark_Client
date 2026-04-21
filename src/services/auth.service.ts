@@ -24,7 +24,11 @@ export const getNewTokenWithRefreshToken = async (refreshToken: string) => {
       return { success: false };
     }
 
-    const { accessToken, refreshToken: newRefreshToken, sessionToken: newSessionToken } = data;
+    const {
+      accessToken,
+      refreshToken: newRefreshToken,
+      sessionToken: newSessionToken,
+    } = data;
 
     if (accessToken) {
       await setTokenCookie("accessToken", accessToken);
@@ -53,7 +57,7 @@ export const getNewTokenWithRefreshToken = async (refreshToken: string) => {
   }
 };
 
-export async function getUserInfo() {
+export const getUserInfo = async () => {
   try {
     const cookieStore = await cookies();
 
@@ -84,7 +88,7 @@ export async function getUserInfo() {
     console.error("Error fetching user info:", error);
     return null;
   }
-}
+};
 
 export const changePasswordService = async (payload: {
   currentPassword: string;

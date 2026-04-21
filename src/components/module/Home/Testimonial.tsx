@@ -3,21 +3,30 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ThumbsUp, Trophy } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
-import { getIdeas } from "@/services/idea.service";
+import CommunityFavoritesSkeleton from "./CommunityFavoritesSkeleton";
+import { useIdeas } from "@/hooks/useIdeas";
 
 export default function Testimonials() {
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ["Testimonial_ideas"],
-    queryFn: () => getIdeas(),
+  const { data, isLoading, isError } = useIdeas({
+    limit: 3,
+    status: "APPROVED",
+    sortBy: "createdAt", // "_count.Votes"
+    sortOrder: "desc",
   });
 
-  const ideasList = data?.data?.data || [];
+  if (isLoading) {
+    return <CommunityFavoritesSkeleton />;
+  }
 
-  const topIdeas = [...ideasList]
-    .filter((i) => i.status === "APPROVED")
-    .sort((a, b) => b._count.votes - a._count.votes)
-    .slice(0, 3);
+  if (isError) {
+    return (
+      <div className="text-center py-20 text-destructive">
+        Failed to load featured ideas
+      </div>
+    );
+  }
+
+  const topIdeas = data?.data ?? [];
 
   return (
     <section className="py-16 bg-green-50/50 dark:bg-green-950/10">
@@ -34,36 +43,49 @@ export default function Testimonials() {
             The most popular sustainability ideas as chosen by our community
           </p>
         </div>
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
           {topIdeas.map((idea, index) => (
             <Card
               key={idea.id}
-              className="relative overflow-hidden hover:shadow-lg transition-shadow"
+              className="relative flex flex-col h-full overflow-hidden hover:shadow-lg transition-shadow"
             >
+              {/* Top badge */}
               {index === 0 && (
-                <div className="absolute top-0 right-0 bg-amber-500 text-white px-3 py-1 text-xs font-bold rounded-bl-lg">
+                <div className="absolute top-0 right-0 bg-amber-500 text-white px-3 py-1 text-xs font-bold rounded-bl-lg z-10">
                   #1 Top Voted
                 </div>
               )}
-              <CardHeader className="pb-2">
+
+              {/* Header */}
+              <CardHeader className="pb-2 space-y-2">
                 <Badge
                   variant="secondary"
                   className="w-fit bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
                 >
                   {idea.category.name}
                 </Badge>
-                <h3 className="font-semibold text-lg mt-2">{idea.title}</h3>
+
+                <h3 className="font-semibold text-lg leading-snug line-clamp-2">
+                  {idea.title}
+                </h3>
               </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground line-clamp-3 mb-4">
+
+              {/* Content */}
+              <CardContent className="flex flex-col flex-1">
+                {/* Description */}
+                <p className="text-sm text-muted-foreground line-clamp-3">
                   {idea.description}
                 </p>
-                <div className="flex items-center justify-between">
+
+                {/* Push footer to bottom */}
+                <div className="mt-auto pt-4 flex items-center justify-between">
                   <div className="flex items-center gap-1 text-green-600 font-semibold">
                     <ThumbsUp className="h-4 w-4" />
                     <span>{idea._count.votes} votes</span>
                   </div>
-                  <span className="text-sm text-muted-foreground">
+
+                  <span className="text-sm text-muted-foreground truncate max-w-30">
                     by {idea.author.name}
                   </span>
                 </div>

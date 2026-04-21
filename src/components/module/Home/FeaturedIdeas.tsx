@@ -2,38 +2,52 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-
 import { ArrowRight } from "lucide-react";
 import IdeaCard from "../idea/IdeaCard";
-import { useQuery } from "@tanstack/react-query";
-import { getIdeas } from "@/services/idea.service";
+import FeaturedIdeasSkeleton from "./FeaturedIdeasSkeleton";
+import { useIdeas } from "@/hooks/useIdeas";
 
 export default function FeaturedIdeas() {
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ["Testimonial_ideas"],
-    queryFn: () => getIdeas(),
+  //pass params to hook (server-side filtering)
+  const { data, isLoading, isError } = useIdeas({
+    limit: 6,
+    page: 1,
+    status: "APPROVED",
+    sortBy: "createdAt",
+    sortOrder: "desc",
   });
 
-  const ideasList = data?.data?.data || [];
+  if (isLoading) return <FeaturedIdeasSkeleton />;
 
-  const featuredIdeas = ideasList
-    .filter((i) => i.status === "APPROVED")
-    .slice(0, 6);
+  if (isError) {
+    return (
+      <div className="text-center py-20 text-destructive">
+        Failed to load featured ideas
+      </div>
+    );
+  }
+
+  const ideas = data?.data ?? [];
 
   return (
     <section className="py-16 bg-background">
       <div className="container mx-auto px-4">
+        {/* Header */}
         <div className="text-center mb-10">
           <h2 className="text-3xl font-bold mb-3">Featured Ideas</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
             Discover the latest sustainability ideas from our community members
           </p>
         </div>
+
+        {/* Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {featuredIdeas.map((idea) => (
+          {ideas.map((idea) => (
             <IdeaCard key={idea.id} idea={idea} />
           ))}
         </div>
+
+        {/* CTA */}
         <div className="text-center mt-8">
           <Button
             asChild

@@ -10,7 +10,7 @@ export interface PaginationMeta {
   totalPage: number;
 }
 
-export interface ApiResponse<TData = unknown> {
+export interface ApiResponse<TData> {
   success: boolean;
   message: string;
   data: TData;

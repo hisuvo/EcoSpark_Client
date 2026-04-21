@@ -28,6 +28,7 @@ type RegisterResponse = RegisterSuccessResponse | RegisterErrorResponse;
 
 export const RegisterAction = async (
   payload: IRegisterPayload,
+  redirectpath?: string,
 ): Promise<RegisterResponse> => {
   try {
     const response = await httpClient.post<RegisterSuccessResponse>(
@@ -37,7 +38,10 @@ export const RegisterAction = async (
 
     if (response.success) {
       const { user } = response.data || {};
-      redirect(`/verify-email?email=${user?.email}`);
+      const redirectUrl = redirectpath
+        ? `&redirect=${encodeURIComponent(redirectpath)}`
+        : "";
+      redirect(`/verify-email?email=${user?.email}${redirectUrl}`);
     }
 
     return {
