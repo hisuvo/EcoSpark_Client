@@ -6,14 +6,12 @@ import { IIdea } from "@/type/idea.type";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import StatsCard from "@/shared/form/StatsCard";
+import { useUser } from "@/hooks/useUser";
 
 const MemberDashboardClient = () => {
-  const { data, isLoading } = useQuery({
-    queryKey: ["my-ideas"],
-    queryFn: () => getIdeas(),
-  });
+  const { data: user, isLoading } = useUser();
 
-  const ideas: IIdea[] = data?.data?.data ?? [];
+  const ideas: IIdea[] = user?.ideas || [];
 
   if (isLoading) {
     return <h1>Loading...</h1>;
@@ -38,6 +36,7 @@ const MemberDashboardClient = () => {
       return acc;
     },
     {
+      total: ideas.length || 0,
       drafts: 0,
       underReview: 0,
       approved: 0,
@@ -61,21 +60,37 @@ const MemberDashboardClient = () => {
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <StatsCard title="Drafts" value={stats.drafts} iconName={"Drafts"} />
+        <StatsCard
+          title="Total"
+          value={stats.total}
+          iconName="FileText"
+          className="bg-blue-100 dark:bg-blue-900/30"
+        />
+
+        <StatsCard
+          title="Drafts"
+          value={stats.drafts}
+          iconName={"Lightbulb"}
+          className="bg-gray-100 dark:bg-gray-800"
+        />
+
         <StatsCard
           title="Under Review"
           value={stats.underReview}
-          iconName={"UnderReview"}
+          iconName={"Clock"}
+          className="bg-yellow-100 dark:bg-yellow-900/30"
         />
         <StatsCard
           title="Approved"
           value={stats.approved}
-          iconName={"Drafts"}
+          iconName={"CheckCircle"}
+          className="bg-green-100 dark:bg-green-900/30"
         />
         <StatsCard
           title="Rejected"
           value={stats.rejected}
-          iconName={"Drafts"}
+          iconName={"XCircle"}
+          className="bg-red-100 dark:bg-red-900/30"
         />
       </div>
     </div>

@@ -28,15 +28,13 @@ import { IDEA_STATUS_COLORS, IDEA_STATUS_LABELS } from "@/lib/constants";
 import { Edit, Trash2, Eye, Send, PlusCircle } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
-import { deleteIdea, getIdeas, updateIdea } from "@/services/idea.service";
+import { deleteIdea, updateIdea } from "@/services/idea.service";
+import { useUser } from "@/hooks/useUser";
+import { IIdea } from "@/type/idea.type";
 
 export default function MyIdeas() {
   const queryClient = useQueryClient();
-
-  const { data, isLoading } = useQuery({
-    queryKey: ["my-ideas"],
-    queryFn: () => getIdeas(),
-  });
+  const { data: user, isLoading } = useUser();
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => deleteIdea(id),
@@ -56,7 +54,7 @@ export default function MyIdeas() {
     onError: () => toast.error("Failed to submit idea"),
   });
 
-  const ideas = data?.data?.data || [];
+  const ideas: IIdea[] = user?.ideas || [];
 
   return (
     <div className="space-y-6">

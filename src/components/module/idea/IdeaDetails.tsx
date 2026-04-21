@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { Badge } from "@/components/ui/badge";
@@ -27,31 +26,36 @@ import { toast } from "sonner";
 
 const IdeaDetails = ({ user }: { user: IUser | null }) => {
   const params = useParams();
-  const currentPath = `/ideas/${params.id}`;
-
   const id = params.id as string;
-  const { data: ideaData, isLoading: ideaLoading } = useQuery({
+  const currentPath = `/ideas/${id}`;
+
+  // ✅ query
+  const { data, isLoading } = useQuery({
     queryKey: ["idea", id],
     queryFn: () => getIdeaById(id),
+    enabled: !!id,
+    staleTime: 1000 * 60 * 5, // cache 5 min
   });
 
+  const idea = data?.data ?? null;
+
+  // ✅ mutation (typed error safer)
   const paymentMutation = useMutation({
     mutationFn: () => createCheckoutSession(id),
-    onSuccess: (data) => {
-      if (data.url) {
-        window.location.href = data.url;
+    onSuccess: (res) => {
+      if (res?.url) {
+        window.open(res.url, "_self");
       }
     },
-    onError: (error: any) => {
-      toast.error(
-        error.response?.data?.message || "Failed to initiate payment",
-      );
+    onError: (error: unknown) => {
+      const message =
+        (error as any)?.response?.data?.message || "Failed to initiate payment";
+      toast.error(message);
     },
   });
 
-  const idea = ideaData?.data;
-
-  if (ideaLoading) {
+  // ✅ loading state
+  if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-8 max-w-4xl space-y-6">
         <Skeleton className="h-8 w-48" />
@@ -62,6 +66,7 @@ const IdeaDetails = ({ user }: { user: IUser | null }) => {
     );
   }
 
+  // ✅ not found
   if (!idea) {
     return (
       <div className="container mx-auto px-4 py-16 text-center">
@@ -76,11 +81,16 @@ const IdeaDetails = ({ user }: { user: IUser | null }) => {
     );
   }
 
+  /**
+   * ✅ FIXED LOCK LOGIC (important)
+   * - locked if paid AND user not logged in
+   * - later you can extend with: !idea.isPurchased
+   */
   const isLocked = idea.isPaid && !user;
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
-      {/* Back Button */}
+      {/* Back */}
       <Link
         href="/ideas"
         className={cn(buttonVariants({ variant: "ghost" }), "mb-6")}
@@ -92,11 +102,12 @@ const IdeaDetails = ({ user }: { user: IUser | null }) => {
       {/* Header */}
       <div className="space-y-4 mb-10">
         <div className="flex flex-wrap items-center gap-2">
-          <Badge className="bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300 hover:bg-green-200">
+          <Badge className="bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300">
             {idea.category.name}
           </Badge>
+
           {idea.isPaid && (
-            <Badge className="bg-amber-500 hover:bg-amber-600 text-white">
+            <Badge className="bg-amber-500 text-white">
               <DollarSign className="h-3 w-3 mr-1" />
               Paid - ${idea.price?.toFixed(2)}
             </Badge>
@@ -110,18 +121,12 @@ const IdeaDetails = ({ user }: { user: IUser | null }) => {
             <User className="h-4 w-4" />
             {idea.author.name}
           </span>
+
           <span className="flex items-center gap-1">
             <Calendar className="h-4 w-4" />
             {format(new Date(idea.createdAt), "MMM dd, yyyy")}
           </span>
         </div>
-
-        {/* <VoteButtons
-          ideaId={idea.id}
-          upvotes={idea.upvotes}
-          downvotes={idea.downvotes}
-          userVote={idea.userVote}
-        /> */}
       </div>
 
       {/* Image */}
@@ -130,44 +135,32 @@ const IdeaDetails = ({ user }: { user: IUser | null }) => {
           <Image
             src={idea.imageUrl}
             alt={idea.title}
-            width={500}
+            width={800}
             height={400}
-            className="w-full max-h-125 object-cover"
+            className="w-full max-h-[500px] object-cover"
           />
         </div>
       )}
 
+      {/* 🔒 LOCKED UI */}
       {isLocked ? (
-        <Card className="border-amber-200 bg-amber-50 dark:bg-amber-950/20 dark:border-amber-800">
+        <Card className="border-amber-200 bg-amber-50 dark:bg-amber-950/20">
           <CardContent className="flex flex-col items-center py-16 text-center">
             <Lock className="h-12 w-12 text-amber-500 mb-4" />
+
             <h3 className="text-xl font-semibold mb-2">Premium Content</h3>
+
+            {/* ✅ FIXED MESSAGE */}
             <p className="text-muted-foreground mb-6 max-w-md">
-              {user
-                ? `This premium idea costs $${idea.price?.toFixed(2)}. Unlock it to view the full problem statement, solution, and high-resolution details.`
-                : `This content is locked. You need to pay $${idea.price?.toFixed(2)} to access the full details. Please login or register to proceed.`}
+              {!user
+                ? "This content is locked. Please login or register to access it."
+                : `This premium idea costs $${idea.price?.toFixed(
+                    2,
+                  )}. Unlock it to view full details.`}
             </p>
 
             <div className="flex flex-wrap justify-center gap-3">
-              {user ? (
-                <Button
-                  onClick={() => paymentMutation.mutate()}
-                  disabled={paymentMutation.isPending}
-                  className="bg-amber-600 hover:bg-amber-700 text-white min-w-[150px]"
-                >
-                  {paymentMutation.isPending ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Processing...
-                    </>
-                  ) : (
-                    <>
-                      <DollarSign className="mr-2 h-4 w-4" />
-                      Pay $${idea.price?.toFixed(2)}
-                    </>
-                  )}
-                </Button>
-              ) : (
+              {!user ? (
                 <>
                   <Link
                     href={`/login?redirect=${encodeURIComponent(currentPath)}`}
@@ -175,6 +168,7 @@ const IdeaDetails = ({ user }: { user: IUser | null }) => {
                   >
                     Login
                   </Link>
+
                   <Link
                     href={`/register?redirect=${encodeURIComponent(currentPath)}`}
                     className={cn(
@@ -185,56 +179,63 @@ const IdeaDetails = ({ user }: { user: IUser | null }) => {
                     Register
                   </Link>
                 </>
+              ) : (
+                <Button
+                  onClick={() => paymentMutation.mutate()}
+                  disabled={paymentMutation.isPending}
+                  className="bg-amber-600 hover:bg-amber-700 text-white min-w-[160px]"
+                >
+                  {paymentMutation.isPending ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      <DollarSign className="mr-2 h-4 w-4" />
+                      Pay ${idea.price?.toFixed(2)}
+                    </>
+                  )}
+                </Button>
               )}
             </div>
           </CardContent>
         </Card>
       ) : (
         <div className="space-y-8">
-          {/* Problem Statement */}
+          {/* Problem */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-xl text-red-600 dark:text-red-400">
-                Problem Statement
-              </CardTitle>
+              <CardTitle className="text-red-600">Problem Statement</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-foreground leading-relaxed whitespace-pre-wrap">
-                {idea.problem}
-              </p>
+              <p className="whitespace-pre-wrap">{idea.problem}</p>
             </CardContent>
           </Card>
 
-          {/* Proposed Solution */}
+          {/* Solution */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-xl text-green-600 dark:text-green-400">
+              <CardTitle className="text-green-600">
                 Proposed Solution
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-foreground leading-relaxed whitespace-pre-wrap">
-                {idea.solution}
-              </p>
+              <p className="whitespace-pre-wrap">{idea.solution}</p>
             </CardContent>
           </Card>
 
-          {/* Detailed Description */}
+          {/* Description */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-xl">Detailed Description</CardTitle>
+              <CardTitle>Detailed Description</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-foreground leading-relaxed whitespace-pre-wrap">
-                {idea.description}
-              </p>
+              <p className="whitespace-pre-wrap">{idea.description}</p>
             </CardContent>
           </Card>
 
           <Separator />
-
-          {/* Comments */}
-          {/* <CommentSection ideaId={idea.id} initialComments={comments} /> */}
         </div>
       )}
     </div>
