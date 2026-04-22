@@ -6,6 +6,7 @@ import QueryProviders from "@/provider/QueryProvider";
 import { ThemeProvider } from "@/provider/ThemeProvider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
+import StripeProvider from "@/provider/StripeProvider";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -47,7 +48,9 @@ export default function RootLayout({
       <body className="min-h-screen flex flex-col">
         <ThemeProvider>
           <TooltipProvider>
-            <QueryProviders>{children}</QueryProviders>
+            <QueryProviders>
+              <StripeProvider>{children}</StripeProvider>
+            </QueryProviders>
             <Toaster richColors position="top-center" />
           </TooltipProvider>
         </ThemeProvider>

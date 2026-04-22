@@ -19,11 +19,26 @@ export interface IIdea {
   createdAt: string;
   updatedAt: string;
   category: ICategory;
-  author: IUser;
+  author: {
+    id: string;
+    name: string;
+  };
   _count: {
     votes: number;
     comments: number;
   };
+  comments: {
+    id: string;
+    content: string;
+    author: {
+      id: string;
+      name: string;
+    };
+  }[];
+
+  // IMPORTANT
+  isHidden?: boolean;
+  isPurchased?: boolean;
 }
 
 export interface IIdeaResponse {
