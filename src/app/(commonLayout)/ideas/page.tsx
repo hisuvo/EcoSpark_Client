@@ -42,8 +42,6 @@ export default function GetAllIdeasPage() {
     [page, limit, sortBy, sortOrder, debouncedSearch, approvedOnly],
   );
 
-  console.log("user memo inside params ->", params);
-
   const { data, isLoading, isError } = useIdeas(params);
 
   const ideas = data?.data ?? [];

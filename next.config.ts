@@ -4,12 +4,14 @@ const nextConfig: NextConfig = {
   /* config options here */
 
   images: {
-    domains: ["images.unsplash.com", "i.ibb.co.com"],
+    // domains: ["images.unsplash.com", "i.ibb.co.com"],
     remotePatterns: [
       {
+        // protocol: "https",
+        // hostname: "i.ibb.co.com",
+        // pathname: "/**",
         protocol: "https",
-        hostname: "i.ibb.co",
-        pathname: "/**",
+        hostname: "**",
       },
     ],
   },

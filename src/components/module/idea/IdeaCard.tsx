@@ -28,7 +28,7 @@ const IdeaCard = ({ idea }: { idea: IIdea }) => {
             alt={idea.title}
             width={500}
             height={500}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            className="object-cover group-hover:scale-105 transition-transform duration-300"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-green-50 dark:bg-green-950/30">

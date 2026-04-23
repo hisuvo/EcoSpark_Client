@@ -19,9 +19,9 @@ const blogPosts = [
     category: "Lifestyle",
     author: "Sarah Green",
     date: "2024-06-15",
-    imageUrl:
-      "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=600",
+    imageUrl: "https://i.ibb.co.com/7xz7CJQS/blog-img-1.webp",
   },
+
   {
     id: 2,
     title: "The Rise of Community Solar Projects",
@@ -30,8 +30,7 @@ const blogPosts = [
     category: "Energy",
     author: "John Eco",
     date: "2024-06-10",
-    imageUrl:
-      "https://images.unsplash.com/photo-1509391366360-2e959784a276?w=600",
+    imageUrl: "https://i.ibb.co.com/DDvxw82q/blog-img-2.webp",
   },
   {
     id: 3,
@@ -41,8 +40,7 @@ const blogPosts = [
     category: "Waste",
     author: "Maria Sustainability",
     date: "2024-06-05",
-    imageUrl:
-      "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=600",
+    imageUrl: "https://i.ibb.co.com/8DFZcpXM/blog-img-3.webp",
   },
   {
     id: 4,
@@ -52,8 +50,7 @@ const blogPosts = [
     category: "Food",
     author: "Emma Earth",
     date: "2024-05-28",
-    imageUrl:
-      "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=600",
+    imageUrl: "https://i.ibb.co.com/sJJkPMHy/blog-img-4.webp",
   },
   {
     id: 5,
@@ -63,7 +60,8 @@ const blogPosts = [
     category: "Transportation",
     author: "David Nature",
     date: "2024-05-20",
-    imageUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=600",
+    imageUrl:
+      "https://i.ibb.co.com/svFBPMKG/the-future-of-electric-vehicles-in-staff-transportation.jpg",
   },
   {
     id: 6,
@@ -73,8 +71,7 @@ const blogPosts = [
     category: "Water",
     author: "Sarah Green",
     date: "2024-05-15",
-    imageUrl:
-      "https://images.unsplash.com/photo-1501004318855-b43cf7468e19?w=600",
+    imageUrl: "https://i.ibb.co.com/Z6ZpKG5Q/home-water-conservation.jpg",
   },
 ];
 
@@ -95,13 +92,13 @@ export default function BlogPage() {
             key={post.id}
             className="group overflow-hidden hover:shadow-lg transition-all duration-300 flex flex-col"
           >
-            <div>
+            <div className="relative w-full h-64">
               <Image
                 src={post.imageUrl}
                 alt={post.title}
-                width={400}
-                height={300}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                fill
+                className="object-cover group-hover:scale-105 transition-transform duration-300"
+                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
               />
             </div>
             <CardHeader className="pb-2">

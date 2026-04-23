@@ -150,7 +150,6 @@ export default function UpdateIdeas() {
         payload.price = value.price;
       }
 
-      console.log("Update payload:", JSON.stringify(payload, null, 2));
       await updateMutation.mutateAsync(payload);
     },
   });

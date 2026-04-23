@@ -109,7 +109,7 @@ export default function Navbar({ user }: { user: IUser }) {
                         alt={user.name}
                         width={36}
                         height={36}
-                        className="rounded-full object-cover h-9 w-9"
+                        className="rounded-full object-cover"
                       />
                     ) : (
                       <AvatarFallback className="bg-green-100 text-green-700">
