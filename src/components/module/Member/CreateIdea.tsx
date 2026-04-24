@@ -32,7 +32,6 @@ import { createIdea } from "@/services/idea.service";
 import { useForm } from "@tanstack/react-form";
 import { ICategory } from "@/type/category.type";
 import AppField from "@/shared/form/AppField";
-import AppSubmitButton from "@/shared/form/AppSubmitButton";
 import { ApiResponse } from "@/type/api.type";
 import Image from "next/image";
 import { uploadImage } from "@/lib/uploadImage";

@@ -1,5 +1,11 @@
-import React from "react";
+import GetCategories from "@/components/module/admin/Category/Categories";
 
-export default function AdminCategoriesPage() {
-  return <div>Admin categories page it.</div>;
-}
+const AdminCategoriesPage = () => {
+  return (
+    <div>
+      <GetCategories />
+    </div>
+  );
+};
+
+export default AdminCategoriesPage;
