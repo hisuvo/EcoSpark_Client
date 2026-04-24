@@ -14,21 +14,9 @@ import AppField from "@/shared/form/AppField";
 import AppSubmitButton from "@/shared/form/AppSubmitButton";
 import { useForm } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Lock } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import z from "zod";
-
-const ChangePasswordSchema = z
-  .object({
-    currentPassword: z.string().min(6, "Minimum 6 characters"),
-    newPassword: z.string().min(6, "Minimum 6 characters"),
-    confirmPassword: z.string().min(6, "Minimum 6 characters"),
-  })
-  .refine((data) => data.newPassword === data.confirmPassword, {
-    message: "Passwords do not match",
-    path: ["confirmPassword"],
-  });
 
 type ChangePasswordPayload = {
   currentPassword: string;
@@ -46,15 +34,12 @@ const ChangePasswordForm = () => {
     mutationFn: (payload: ChangePasswordPayload) =>
       changePasswordService(payload),
     onSuccess: (data) => {
-      toast.success(data?.message || "Password changed successfully!");
-      // Reset form fields
+      toast.success(data?.message || "Password updated successfully!");
       form.reset();
-      // Clear password visibility toggles
       setShow({ current: false, new: false, confirm: false });
     },
     onError: (error: any) => {
-      const errorMsg = error?.message || "Failed to change password";
-      toast.error(errorMsg);
+      toast.error(error?.message || "Something went wrong");
     },
   });
 
@@ -66,102 +51,136 @@ const ChangePasswordForm = () => {
     },
     onSubmit: async ({ value }) => {
       const { currentPassword, newPassword } = value;
-      const payload = { currentPassword, newPassword };
-      await mutation.mutateAsync(payload);
+      await mutation.mutateAsync({ currentPassword, newPassword });
     },
   });
 
-  const PasswordToggle = ({
+  const PasswordField = ({
     field,
     typeKey,
+    label,
   }: {
     field: any;
     typeKey: "current" | "new" | "confirm";
+    label: string;
   }) => {
     return (
-      <div className="relative">
-        <AppField
-          field={field}
-          label={field.name}
-          type={show[typeKey] ? "text" : "password"}
-          placeholder={`Enter ${field.name}`}
-        />
+      <div className="space-y-1">
+        <div className="relative">
+          <AppField
+            field={field}
+            label={label}
+            type={show[typeKey] ? "text" : "password"}
+            placeholder={`Enter ${label.toLowerCase()}`}
+            className="pr-10"
+          />
 
-        <Button
-          variant="ghost"
-          type="button"
-          onClick={() =>
-            setShow((prev) => ({ ...prev, [typeKey]: !prev[typeKey] }))
-          }
-          className="absolute right-3 top-8 text-muted-foreground"
-        >
-          {show[typeKey] ? <EyeOff size={18} /> : <Eye size={18} />}
-        </Button>
+          <button
+            type="button"
+            onClick={() =>
+              setShow((prev) => ({
+                ...prev,
+                [typeKey]: !prev[typeKey],
+              }))
+            }
+            className="absolute right-3 top-9 text-gray-400 hover:text-gray-700 transition"
+          >
+            {show[typeKey] ? <EyeOff size={18} /> : <Eye size={18} />}
+          </button>
+        </div>
       </div>
     );
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Change Password</CardTitle>
-        <CardDescription>
-          Update your password for account security
-        </CardDescription>
-      </CardHeader>
+    <div className="max-w-4xl mx-auto min-h-[80vh] px-4">
+      <Card className="shadow-sm border">
+        <CardHeader className="space-y-2 text-center">
+          <div className="flex justify-center">
+            <div className="p-3 rounded-full bg-gray-100">
+              <Lock className="w-5 h-5 text-gray-600" />
+            </div>
+          </div>
 
-      <CardContent>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            form.handleSubmit();
-          }}
-          className="space-y-4"
-        >
-          {/* Current Password */}
-          <form.Field name="currentPassword">
-            {(field) => <PasswordToggle field={field} typeKey="current" />}
-          </form.Field>
+          <CardTitle className="text-2xl font-semibold">
+            Change Password
+          </CardTitle>
 
-          {/* New Password */}
-          <form.Field name="newPassword">
-            {(field) => <PasswordToggle field={field} typeKey="new" />}
-          </form.Field>
+          <CardDescription className="text-sm text-gray-500">
+            Keep your account secure by updating your password regularly
+          </CardDescription>
+        </CardHeader>
 
-          {/* Confirm Password */}
-          <form.Field
-            name="confirmPassword"
-            validators={{
-              onChangeListenTo: ["newPassword"],
-              onChange: ({ value, fieldApi }) => {
-                const newPassword = fieldApi.form.getFieldValue("newPassword");
-
-                if (value !== newPassword) {
-                  return "Passwords do not match";
-                }
-
-                return undefined;
-              },
+        <CardContent>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              form.handleSubmit();
             }}
+            className="space-y-5"
           >
-            {(field) => <PasswordToggle field={field} typeKey="confirm" />}
-          </form.Field>
+            {/* Current Password */}
+            <form.Field name="currentPassword">
+              {(field) => (
+                <PasswordField
+                  field={field}
+                  typeKey="current"
+                  label="Current Password"
+                />
+              )}
+            </form.Field>
 
-          {/* Submit */}
-          <form.Subscribe selector={(state) => [state.canSubmit]}>
-            {([canSubmit]) => (
-              <AppSubmitButton
-                isSubmitting={mutation.isPending}
-                disabled={!canSubmit || mutation.isPending}
-                className="w-full"
-              >
-                Change Password
-              </AppSubmitButton>
-            )}
-          </form.Subscribe>
-        </form>
-      </CardContent>
-    </Card>
+            {/* New Password */}
+            <form.Field name="newPassword">
+              {(field) => (
+                <PasswordField
+                  field={field}
+                  typeKey="new"
+                  label="New Password"
+                />
+              )}
+            </form.Field>
+
+            {/* Confirm Password */}
+            <form.Field
+              name="confirmPassword"
+              validators={{
+                onChangeListenTo: ["newPassword"],
+                onChange: ({ value, fieldApi }) => {
+                  const newPassword =
+                    fieldApi.form.getFieldValue("newPassword");
+                  if (value !== newPassword) {
+                    return "Passwords do not match";
+                  }
+                  return undefined;
+                },
+              }}
+            >
+              {(field) => (
+                <PasswordField
+                  field={field}
+                  typeKey="confirm"
+                  label="Confirm Password"
+                />
+              )}
+            </form.Field>
+
+            {/* Submit */}
+            <form.Subscribe selector={(state) => [state.canSubmit]}>
+              {([canSubmit]) => (
+                <AppSubmitButton
+                  isSubmitting={mutation.isPending}
+                  disabled={!canSubmit || mutation.isPending}
+                  className="w-full h-11 rounded-lg text-base font-medium"
+                >
+                  {mutation.isPending ? "Updating..." : "Update Password"}
+                </AppSubmitButton>
+              )}
+            </form.Subscribe>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 

@@ -74,6 +74,7 @@ export const getUserInfo = async () => {
         "Content-Type": "application/json",
         Cookie: `accessToken=${accessToken}; better-auth.session_token=${sessionToken}`,
       },
+      cache: "no-store",
     });
 
     if (!res.ok) {

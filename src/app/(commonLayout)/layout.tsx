@@ -2,6 +2,8 @@ import Footer from "@/components/layout/Footer";
 import Navbar from "@/components/layout/Navbar";
 import { getUserInfo } from "@/services/auth.service";
 
+export const dynamic = "force-dynamic";
+
 export default async function HomeLayout({
   children,
 }: {

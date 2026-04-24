@@ -1,20 +1,30 @@
 import DashboardNavbar from "@/components/module/Dashboard/DashboardNavbar";
 import DashboardSidebar from "@/components/module/Dashboard/DashboardSidebar";
+import { getUserInfo } from "@/services/auth.service";
 
-export default function DashboardRootLayout({
+
+export const dynamic = "force-dynamic";
+
+export default async function DashboardRootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const userInfo = await getUserInfo();
+
+  if (!userInfo) {
+    return null;
+  }
+
   return (
     <div className="fixed inset-0 flex flex-col">
       {/* Fixed Navbar */}
-      <DashboardNavbar />
+      <DashboardNavbar userInfo={userInfo} />
 
       <div className="flex flex-1 overflow-hidden">
         {/* Fixed Sidebar - Hidden on mobile */}
         <div className="hidden md:block">
-          <DashboardSidebar />
+          <DashboardSidebar userInfo={userInfo} />
         </div>
 
         {/* Scrollable Content */}
