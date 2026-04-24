@@ -48,8 +48,6 @@ const GetCategories = () => {
   const categories = categoryList?.data;
   const metaData = categoryList?.meta;
 
-
-
   const deleteMutation = useMutation({
     mutationFn: (id: string) => deleteCategory(id),
     onSuccess: () => {
@@ -101,7 +99,9 @@ const GetCategories = () => {
                   <TableHead className="hidden md:table-cell">
                     Description
                   </TableHead>
-                  <TableHead className="hidden sm:table-cell">Created</TableHead>
+                  <TableHead className="hidden sm:table-cell">
+                    Created
+                  </TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -111,7 +111,7 @@ const GetCategories = () => {
                   <TableRow key={cat.id}>
                     <TableCell className="font-medium">{cat.name}</TableCell>
 
-                    <TableCell className="hidden md:table-cell text-sm text-muted-foreground max-w-[300px] truncate">
+                    <TableCell className="hidden md:table-cell text-sm text-muted-foreground max-w-75 truncate">
                       {cat.description || "-"}
                     </TableCell>
 

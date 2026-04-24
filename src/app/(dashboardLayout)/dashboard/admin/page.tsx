@@ -4,38 +4,31 @@ import {
   QueryClient,
 } from "@tanstack/react-query";
 import React from "react";
+import AdminOverview from "@/components/module/admin/Overview";
+import { getAdminStats, getAllUsers } from "@/services/user.service";
 
 const AdminDashboardpage = async () => {
   const queryClient = new QueryClient();
 
-  // await Promise.all([
-  //   queryClient.prefetchQuery({
-  //     queryKey: ["admin-dashboard-categories"],
-  //     queryFn: () => console.log("this is categories"),
-  //     staleTime: 30 * 1000,
-  //     gcTime: 5 * 60 * 1000,
-  //   }),
+  await Promise.all([
+    queryClient.prefetchQuery({
+      queryKey: ["users", { limit: 5 }],
+      queryFn: () => getAllUsers({ limit: 5 }),
+    }),
 
-  //   queryClient.prefetchQuery({
-  //     queryKey: ["admin-dashboard-allUsers"],
-  //     queryFn: () => console.log("amdin dashboard all users"),
-  //     staleTime: 30 * 1000,
-  //     gcTime: 5 * 60 * 1000,
-  //   }),
-
-  //   queryClient.prefetchQuery({
-  //     queryKey: ["admin-dashboard-comments"],
-  //     queryFn: () => console.log("amdin dashboard all comments"),
-  //     staleTime: 30 * 1000,
-  //     gcTime: 5 * 60 * 1000,
-  //   }),
-  // ]);
+    queryClient.prefetchQuery({
+      queryKey: ["admin-stats"],
+      queryFn: () => getAdminStats(),
+    }),
+  ]);
 
   const dehydrateState = dehydrate(queryClient);
 
   return (
     <HydrationBoundary state={dehydrateState}>
-      <div>This is admin dashboard hydration data</div>
+      <div className="p-6 lg:p-8">
+        <AdminOverview />
+      </div>
     </HydrationBoundary>
   );
 };
