@@ -7,6 +7,7 @@ import {
   IIdea,
   IIdeaResponse,
   IUpdateIdeaPayload,
+  IdeaStatus,
 } from "@/type/idea.type";
 
 export const getIdeas = async (
@@ -62,6 +63,35 @@ export const deleteIdea = async (id: string) => {
     return response;
   } catch (error) {
     console.error("Error deleting idea:", error);
+    throw error;
+  }
+};
+
+
+
+export const updateIdeaStatus = async (
+  id: string,
+  status: IdeaStatus,
+  feedback?: string,
+) => {
+  try {
+    const response = await httpClient.patch<IIdea>(`/ideas/${id}`, {
+      status,
+      feedback,
+    });
+    return response;
+  } catch (error) {
+    console.error("Error updating idea status:", error);
+    throw error;
+  }
+};
+
+export const deleteComment = async (commentId: string) => {
+  try {
+    const response = await httpClient.delete<null>(`/comments/${commentId}`);
+    return response;
+  } catch (error) {
+    console.error("Error deleting comment:", error);
     throw error;
   }
 };

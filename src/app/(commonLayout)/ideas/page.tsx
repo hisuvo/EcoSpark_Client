@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 import IdeaCard from "@/components/module/idea/IdeaCard";
 import { Spinner } from "@/components/ui/spinner";
 import { Input } from "@/components/ui/input";
@@ -18,16 +19,31 @@ import {
 } from "@/components/ui/select";
 
 export default function GetAllIdeasPage() {
-  const [searchTerm, setSearchTerm] = useState("");
+  const searchParams = useSearchParams();
+
+  const [searchTerm, setSearchTerm] = useState(searchParams.get("searchTerm") || "");
   const debouncedSearch = useDebounce(searchTerm, 500);
 
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
   const limit = 6;
 
-  const [sortBy, setSortBy] = useState("createdAt");
-  const [sortOrder, setSortOrder] = useState("desc");
+  const [sortBy, setSortBy] = useState(searchParams.get("sortBy") || "createdAt");
+  const [sortOrder, setSortOrder] = useState(searchParams.get("sortOrder") || "desc");
 
-  const [approvedOnly, setApprovedOnly] = useState(false);
+  const [approvedOnly, setApprovedOnly] = useState(searchParams.get("status") === "APPROVED");
+
+  // Update state when search params change (for back/forward navigation)
+  useEffect(() => {
+    const status = searchParams.get("status");
+    const sort = searchParams.get("sortBy");
+    const order = searchParams.get("sortOrder");
+    const search = searchParams.get("searchTerm");
+    
+    if (status) setApprovedOnly(status === "APPROVED");
+    if (sort) setSortBy(sort);
+    if (order) setSortOrder(order);
+    if (search) setSearchTerm(search);
+  }, [searchParams]);
 
   // memo params
   const params = useMemo(
@@ -92,7 +108,7 @@ export default function GetAllIdeasPage() {
             <SelectContent>
               <SelectItem value="createdAt">Date</SelectItem>
               <SelectItem value="title">Title</SelectItem>
-              <SelectItem value="_count.votes">Votes</SelectItem>
+              <SelectItem value="UPVOTE">Votes</SelectItem>
             </SelectContent>
           </Select>
 

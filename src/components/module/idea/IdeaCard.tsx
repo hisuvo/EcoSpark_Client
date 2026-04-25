@@ -7,6 +7,7 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import {
+  ArrowRight,
   DollarSign,
   Link as LinkIcon,
   MessageSquare,
@@ -64,27 +65,26 @@ const IdeaCard = ({ idea }: { idea: IIdea }) => {
       </CardContent>
 
       <CardFooter className="flex items-center justify-between pt-2 border-t">
-        <div className="flex items-center gap-3 text-sm text-muted-foreground">
-          <span className="flex items-center gap-1">
-            <ThumbsUp className="h-3.5 w-3.5" />
+        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+          <span className="flex items-center gap-1.5 font-medium text-green-600">
+            <ThumbsUp className="h-4 w-4" />
             {idea?._count?.votes}
           </span>
-          <span className="flex items-center gap-1">
-            <ThumbsDown className="h-3.5 w-3.5" />
-            {idea?._count?.votes}
-          </span>
-          <span className="flex items-center gap-1">
-            <MessageSquare className="h-3.5 w-3.5" />
+          <span className="flex items-center gap-1.5">
+            <MessageSquare className="h-4 w-4" />
             {idea?._count?.comments}
           </span>
         </div>
         <Button
           variant="ghost"
           size="sm"
-          className="text-green-600 hover:text-green-700 hover:bg-green-50 dark:hover:bg-green-950/50"
+          className="text-green-600 hover:text-green-700 hover:bg-green-50 dark:hover:bg-green-950/50 group/btn"
           asChild
         >
-          <Link href={`/ideas/${idea.id}`}>View Idea</Link>
+          <Link href={`/ideas/${idea.id}`} className="flex items-center gap-1">
+            Details
+            <ArrowRight className="h-3.5 w-3.5 opacity-0 group-hover/btn:opacity-100 -translate-x-2 group-hover/btn:translate-x-0 transition-all" />
+          </Link>
         </Button>
       </CardFooter>
     </Card>

@@ -67,6 +67,7 @@ export interface IUpdateIdeaPayload {
   description?: string;
   categoryId?: string;
   status?: IdeaStatus;
+  feedback?: string;
   isPremium?: boolean;
   price?: number;
 }

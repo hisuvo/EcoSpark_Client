@@ -10,7 +10,7 @@ export default function Testimonials() {
   const { data, isLoading, isError } = useIdeas({
     limit: 3,
     status: "APPROVED",
-    sortBy: "createdAt", // "_count.Votes"
+    sortBy: "UPVOTE",
     sortOrder: "desc",
   });
 

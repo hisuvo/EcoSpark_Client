@@ -26,3 +26,26 @@ export const getAdminStats = async () => {
     };
   }
 };
+export const updateUserStatus = async (id: string, status: string) => {
+  try {
+    const response = await httpClient.patch<IUser>(`/users/${id}/status`, {
+      status,
+    });
+    return response;
+  } catch (error) {
+    console.error("Error updating user status:", error);
+    throw error;
+  }
+};
+
+export const changeUserRole = async (id: string, role: string) => {
+  try {
+    const response = await httpClient.patch<IUser>(`/users/${id}/role`, {
+      role,
+    });
+    return response;
+  } catch (error) {
+    console.error("Error changing user role:", error);
+    throw error;
+  }
+};
