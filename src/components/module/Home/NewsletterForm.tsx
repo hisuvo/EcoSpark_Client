@@ -21,7 +21,6 @@ export default function NewsletterForm() {
     setIsLoading(false);
     setIsSubscribed(true);
     setEmail("");
-    // console.log("Subscribed successfully!");
   };
 
   return (

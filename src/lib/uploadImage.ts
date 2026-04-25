@@ -4,11 +4,13 @@ import axios from "axios";
  * Uploads an image to ImgBB and returns the direct image URL.
  * Supports File, Blob, or base64 data.
  * Includes validation for image type and size (max 32MB).
- * 
+ *
  * @param image - The image file, blob, or base64 string to upload
  * @returns Promise<string | null> - The direct URL of the uploaded image or null if upload fails
  */
-export const uploadImage = async (image: File | Blob | string): Promise<string | null> => {
+export const uploadImage = async (
+  image: File | Blob | string,
+): Promise<string | null> => {
   const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
 
   if (!apiKey) {
@@ -58,7 +60,7 @@ export const uploadImage = async (image: File | Blob | string): Promise<string |
         headers: {
           "Content-Type": "multipart/form-data",
         },
-      }
+      },
     );
 
     if (response.data && response.data.success) {
@@ -72,19 +74,3 @@ export const uploadImage = async (image: File | Blob | string): Promise<string |
     return null;
   }
 };
-
-/**
-import { uploadImage } from "@/shared/uploadImage";
-
-// Example Usage (with a File):
-const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-  const file = e.target.files?.[0];
-  if (file) {
-    const imageUrl = await uploadImage(file); // Automatically validates
-    if (imageUrl) {
-      console.log("Uploaded Image URL:", imageUrl);
-    }
-  }
-};
-
- */

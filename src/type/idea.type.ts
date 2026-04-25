@@ -35,6 +35,9 @@ export interface IIdea {
       name: string;
     };
   }[];
+  votes?: {
+    type: "UPVOTE" | "DOWNVOTE";
+  }[];
 
   // IMPORTANT
   isHidden?: boolean;

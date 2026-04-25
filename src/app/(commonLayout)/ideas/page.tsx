@@ -1,7 +1,7 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import IdeaCard from "@/components/module/idea/IdeaCard";
 import { Spinner } from "@/components/ui/spinner";
 import { Input } from "@/components/ui/input";
@@ -19,33 +19,63 @@ import {
 } from "@/components/ui/select";
 
 export default function GetAllIdeasPage() {
+  const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const [searchTerm, setSearchTerm] = useState(searchParams.get("searchTerm") || "");
+  // Local state only for the search input to keep typing responsive
+  const [searchTerm, setSearchTerm] = useState(
+    searchParams.get("searchTerm") || "",
+  );
   const debouncedSearch = useDebounce(searchTerm, 500);
 
-  const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
+  // Derive other values directly from URL (Source of Truth)
+  const page = Number(searchParams.get("page")) || 1;
+  const sortBy = searchParams.get("sortBy") || "createdAt";
+  const sortOrder = searchParams.get("sortOrder") || "desc";
+  const approvedOnly = searchParams.get("status") === "APPROVED";
   const limit = 6;
 
-  const [sortBy, setSortBy] = useState(searchParams.get("sortBy") || "createdAt");
-  const [sortOrder, setSortOrder] = useState(searchParams.get("sortOrder") || "desc");
+  // Helper to update URL params
+  const createQueryString = useCallback(
+    (paramsToUpdate: Record<string, string | null>) => {
+      const params = new URLSearchParams(searchParams.toString());
+      Object.entries(paramsToUpdate).forEach(([name, value]) => {
+        if (value === null) {
+          params.delete(name);
+        } else {
+          params.set(name, value);
+        }
+      });
+      return params.toString();
+    },
+    [searchParams],
+  );
 
-  const [approvedOnly, setApprovedOnly] = useState(searchParams.get("status") === "APPROVED");
+  // Track the URL value to detect external changes (like back button)
+  const searchInUrl = searchParams.get("searchTerm") || "";
+  const [prevSearchInUrl, setPrevSearchInUrl] = useState(searchInUrl);
 
-  // Update state when search params change (for back/forward navigation)
+  // If the URL changed externally, sync the local state during render
+  // This pattern is better than useEffect as it avoids cascading renders.
+  if (searchInUrl !== prevSearchInUrl) {
+    setPrevSearchInUrl(searchInUrl);
+    setSearchTerm(searchInUrl);
+  }
+
+  // Update URL when search is debounced
   useEffect(() => {
-    const status = searchParams.get("status");
-    const sort = searchParams.get("sortBy");
-    const order = searchParams.get("sortOrder");
-    const search = searchParams.get("searchTerm");
-    
-    if (status) setApprovedOnly(status === "APPROVED");
-    if (sort) setSortBy(sort);
-    if (order) setSortOrder(order);
-    if (search) setSearchTerm(search);
-  }, [searchParams]);
+    const searchInUrl = searchParams.get("searchTerm") || "";
+    if (debouncedSearch !== searchInUrl) {
+      const query = createQueryString({
+        searchTerm: debouncedSearch || null,
+        page: "1", // Reset to page 1 on new search
+      });
+      router.replace(`${pathname}?${query}`, { scroll: false });
+    }
+  }, [debouncedSearch, pathname, router, createQueryString, searchParams]);
 
-  // memo params
+  // memo params for the API hook
   const params = useMemo(
     () => ({
       page,
@@ -53,7 +83,7 @@ export default function GetAllIdeasPage() {
       sortBy,
       sortOrder,
       ...(debouncedSearch && { searchTerm: debouncedSearch }),
-      ...(approvedOnly && { status: "APPROVED" }), // backend filter
+      ...(approvedOnly && { status: "APPROVED" }),
     }),
     [page, limit, sortBy, sortOrder, debouncedSearch, approvedOnly],
   );
@@ -64,25 +94,32 @@ export default function GetAllIdeasPage() {
   const meta = data?.meta;
   const totalPages = Math.ceil((meta?.total || 0) / limit);
 
-  // handlers
+  // handlers that update the URL
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
-    setPage(1);
   };
 
   const handleSortBy = (val: string) => {
-    setSortBy(val);
-    setPage(1);
+    const query = createQueryString({ sortBy: val, page: "1" });
+    router.push(`${pathname}?${query}`, { scroll: false });
   };
 
   const handleSortOrder = (val: string) => {
-    setSortOrder(val);
-    setPage(1);
+    const query = createQueryString({ sortOrder: val, page: "1" });
+    router.push(`${pathname}?${query}`, { scroll: false });
   };
 
   const toggleApproved = () => {
-    setApprovedOnly((prev) => !prev);
-    setPage(1);
+    const query = createQueryString({
+      status: approvedOnly ? null : "APPROVED",
+      page: "1",
+    });
+    router.push(`${pathname}?${query}`, { scroll: false });
+  };
+
+  const handlePageChange = (newPage: number) => {
+    const query = createQueryString({ page: String(newPage) });
+    router.push(`${pathname}?${query}`, { scroll: false });
   };
 
   return (
@@ -165,7 +202,7 @@ export default function GetAllIdeasPage() {
               <Button
                 variant="outline"
                 disabled={page === 1}
-                onClick={() => setPage((p) => p - 1)}
+                onClick={() => handlePageChange(page - 1)}
               >
                 Prev
               </Button>
@@ -177,7 +214,7 @@ export default function GetAllIdeasPage() {
               <Button
                 variant="outline"
                 disabled={page === totalPages}
-                onClick={() => setPage((p) => p + 1)}
+                onClick={() => handlePageChange(page + 1)}
               >
                 Next
               </Button>

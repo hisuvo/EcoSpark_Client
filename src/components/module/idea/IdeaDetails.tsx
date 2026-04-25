@@ -23,6 +23,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { toast } from "sonner";
+import CommentSection from "./CommentSection";
+import VoteControl from "../voting/VoteControl";
 
 import { useEffect } from "react";
 import PaymentForm from "@/components/payment/PaymentForm";
@@ -94,7 +96,6 @@ const IdeaDetails = ({ user }: { user: IUser | null }) => {
   }
 
   // LOCK LOGIC
-  // const isLocked = idea?.isHidden;
   const isLocked = idea?.isHidden || (idea.isPaid && !user);
 
   return (
@@ -109,30 +110,39 @@ const IdeaDetails = ({ user }: { user: IUser | null }) => {
       </Link>
 
       {/* HEADER */}
-      <div className="space-y-3 mb-8">
-        <div className="flex gap-2 flex-wrap">
-          <Badge>{idea.category.name}</Badge>
+      <div className="flex flex-col md:flex-row justify-between items-start gap-6 mb-8">
+        <div className="space-y-3 flex-1">
+          <div className="flex gap-2 flex-wrap">
+            <Badge>{idea.category.name}</Badge>
 
-          {idea.isPaid && (
-            <Badge className="bg-amber-500 text-white">
-              <DollarSign className="h-3 w-3 mr-1" />${idea.price?.toFixed(2)}
-            </Badge>
-          )}
+            {idea.isPaid && (
+              <Badge className="bg-amber-500 text-white">
+                <DollarSign className="h-3 w-3 mr-1" />${idea.price?.toFixed(2)}
+              </Badge>
+            )}
+          </div>
+
+          <h1 className="text-3xl font-bold tracking-tight">{idea.title}</h1>
+
+          <div className="flex gap-4 text-sm text-muted-foreground">
+            <span className="flex items-center gap-1">
+              <User className="h-4 w-4" />
+              {idea.author.name}
+            </span>
+
+            <span className="flex items-center gap-1">
+              <Calendar className="h-4 w-4" />
+              {format(new Date(idea.createdAt), "MMM dd, yyyy")}
+            </span>
+          </div>
         </div>
 
-        <h1 className="text-3xl font-bold">{idea.title}</h1>
-
-        <div className="flex gap-4 text-sm text-muted-foreground">
-          <span className="flex items-center gap-1">
-            <User className="h-4 w-4" />
-            {idea.author.name}
-          </span>
-
-          <span className="flex items-center gap-1">
-            <Calendar className="h-4 w-4" />
-            {format(new Date(idea.createdAt), "MMM dd, yyyy")}
-          </span>
-        </div>
+        <VoteControl
+          ideaId={idea.id}
+          initialVoteCount={idea._count.votes}
+          userVote={idea.votes?.[0]?.type || null}
+          isLoggedIn={!!user}
+        />
       </div>
 
       {/* IMAGE */}
@@ -232,6 +242,13 @@ const IdeaDetails = ({ user }: { user: IUser | null }) => {
           <Separator />
         </div>
       )}
+
+      {/* COMMENTS SECTION */}
+      <CommentSection
+        ideaId={idea.id}
+        comments={idea.comments || []}
+        user={user}
+      />
     </div>
   );
 };

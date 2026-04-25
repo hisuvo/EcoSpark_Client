@@ -67,8 +67,6 @@ export const deleteIdea = async (id: string) => {
   }
 };
 
-
-
 export const updateIdeaStatus = async (
   id: string,
   status: IdeaStatus,
@@ -86,12 +84,39 @@ export const updateIdeaStatus = async (
   }
 };
 
+export const createComment = async (ideaId: string, content: string) => {
+  try {
+    const response = await httpClient.post(`/comments/${ideaId}/comments`, {
+      content,
+    });
+    return response;
+  } catch (error) {
+    console.error("Error creating comment:", error);
+    throw error;
+  }
+};
+
 export const deleteComment = async (commentId: string) => {
   try {
     const response = await httpClient.delete<null>(`/comments/${commentId}`);
     return response;
   } catch (error) {
     console.error("Error deleting comment:", error);
+    throw error;
+  }
+};
+
+export const castVote = async (
+  ideaId: string,
+  type: "UPVOTE" | "DOWNVOTE" | null,
+) => {
+  try {
+    const response = await httpClient.post(`/votes/${ideaId}/vote`, {
+      type,
+    });
+    return response;
+  } catch (error) {
+    console.error("Error casting vote:", error);
     throw error;
   }
 };
