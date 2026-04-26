@@ -49,13 +49,15 @@ export default function PaymentForm({
       });
 
       if (result.error) {
-        toast.error(result.error.message || "Payment failed");
+        console.error(result.error.message);
+        toast.error("Payment failed");
       } else {
         toast.success("Payment successful");
         onSuccess?.();
       }
     } catch (err: any) {
-      toast.error(err.message || "Something went wrong");
+      console.error(err.message);
+      toast.error("Something went wrong");
     } finally {
       setLoading(false);
     }

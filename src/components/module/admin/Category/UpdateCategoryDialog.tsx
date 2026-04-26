@@ -39,7 +39,8 @@ const UpdateCategoryDialog = ({ category }: Props) => {
       setOpen(false);
     },
     onError: (error: any) => {
-      toast.error(error?.message || "Failed to update category");
+      console.error(error?.message);
+      toast.error("Failed to update category");
     },
   });
 

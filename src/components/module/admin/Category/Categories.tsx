@@ -59,7 +59,8 @@ const GetCategories = () => {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
     },
     onError: (error: any) => {
-      toast.error(error?.message || "Failed to delete category");
+      console.error(error?.message)
+      toast.error("Failed to delete category");
     },
   });
 

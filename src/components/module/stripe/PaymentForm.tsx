@@ -2,6 +2,7 @@
 
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export default function PaymentForm({ ideaId = 12 }) {
   const stripe = useStripe();
@@ -26,9 +27,10 @@ export default function PaymentForm({ ideaId = 12 }) {
     });
 
     if (result?.error) {
-      alert(result.error.message);
+      console.error(result.error.message);
+      toast.error("Payment faile");
     } else {
-      alert("Payment success");
+      toast.success("Payment success");
       window.location.reload();
     }
 

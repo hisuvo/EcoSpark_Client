@@ -19,10 +19,8 @@ export const useUpdateUserStatus = () => {
       });
     },
     onError: (error: any, __, context) => {
-      toast.error(
-        error?.response?.data?.message || "Failed to update user status",
-        { id: context?.toastId }
-      );
+      console.error(error?.response?.data?.message);
+      toast.error("Failed to update user status", { id: context?.toastId });
     },
   });
 };
@@ -43,10 +41,8 @@ export const useChangeUserRole = () => {
       });
     },
     onError: (error: any, __, context) => {
-      toast.error(
-        error?.response?.data?.message || "Failed to change user role",
-        { id: context?.toastId }
-      );
+      console.error(error?.response?.data?.message);
+      toast.error("Failed to change user role", { id: context?.toastId });
     },
   });
 };

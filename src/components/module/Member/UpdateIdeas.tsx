@@ -64,7 +64,6 @@ export const updateIdeaSchema = z.object({
 
   imageUrl: z
     .string()
-    .url()
     .optional()
     .or(z.literal(""))
     .transform((val) => (val === "" ? undefined : val)),
@@ -117,7 +116,8 @@ export default function UpdateIdeas() {
         error?.response?.data?.message ||
         error.message ||
         "Failed to update idea";
-      toast.error(errorMsg);
+      console.error(errorMsg);
+      toast.error("Only draft idea user can be update");
     },
   });
 

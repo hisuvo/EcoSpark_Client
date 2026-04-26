@@ -39,7 +39,8 @@ const ChangePasswordForm = () => {
       setShow({ current: false, new: false, confirm: false });
     },
     onError: (error: any) => {
-      toast.error(error?.message || "Something went wrong");
+      console.error(error?.message);
+      toast.error("Something went wrong");
     },
   });
 

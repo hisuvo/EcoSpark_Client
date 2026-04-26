@@ -42,7 +42,7 @@ export default function MyIdeas() {
       queryClient.invalidateQueries({ queryKey: ["my-ideas"] });
       toast.success("Idea deleted successfully");
     },
-    onError: () => toast.error("Failed to delete idea"),
+    onError: () => toast.error("You can delete only DRAFT idea"),
   });
 
   const submitMutation = useMutation({
@@ -209,6 +209,5 @@ export default function MyIdeas() {
         </div>
       )}
     </div>
-    // <h2>hello world</h2>
   );
 }

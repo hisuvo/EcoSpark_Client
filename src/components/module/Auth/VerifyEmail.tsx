@@ -47,11 +47,12 @@ export default function VerifyEmail() {
         const loginRedirect = redirect ? `?redirect=${redirect}` : "/login";
         router.push(loginRedirect);
       } else {
-        toast.error(data.message || "Verification failed");
+        toast.error("Verification failed");
       }
     },
     onError: (error: any) => {
-      toast.error(error.message || "An error occurred during verification");
+      console.error(error);
+      toast.error("An error occurred during verification");
     },
   });
 

@@ -41,7 +41,8 @@ const CreateCategoryDialog = () => {
       setOpen(false);
     },
     onError: (error: any) => {
-      toast.error(error?.message || "Failed to create category");
+      console.error(error?.message);
+      toast.error("Failed to create category");
     },
   });
 

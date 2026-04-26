@@ -27,7 +27,8 @@ export const useUpdateIdeaStatus = () => {
       });
     },
     onError: (error: any, __, context) => {
-      toast.error(error?.response?.data?.message || "Failed to update status", {
+      console.error(error?.response?.data?.message);
+      toast.error("Failed to update status", {
         id: context?.toastId,
       });
     },
@@ -49,7 +50,7 @@ export const useDeleteComment = () => {
     onError: (error: any, __, context) => {
       toast.error(
         error?.response?.data?.message || "Failed to delete comment",
-        { id: context?.toastId }
+        { id: context?.toastId },
       );
     },
   });

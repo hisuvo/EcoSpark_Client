@@ -54,6 +54,7 @@ export default function RegisterForm({ redirectpath }: RegisterFormProps) {
           toast.error(response.message || "Login failed!");
         }
 
+        toast.success("Created account successfully");
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         toast.error(`Login failed : ${error.message}`);
