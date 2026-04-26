@@ -60,12 +60,6 @@ export const RegisterAction = async (
       throw error;
     }
 
-    if (axios.isAxiosError(error)) {
-      return {
-        success: false,
-        message: error.response?.data?.message || "Login failed",
-      };
-    }
     return {
       success: false,
       message:

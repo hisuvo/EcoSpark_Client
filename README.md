@@ -1,4 +1,4 @@
-# 🌱 EcoSpark Hub - Frontend
+# 🌱 EcoSpark - Frontend
 
 ![EcoSpark Hub](https://img.shields.io/badge/Status-Active-brightgreen)
 ![Next.js](https://img.shields.io/badge/Next.js-16.x-black)

@@ -29,6 +29,7 @@ import VoteControl from "../voting/VoteControl";
 import { useEffect } from "react";
 import PaymentForm from "@/components/payment/PaymentForm";
 import { usePaymentStatus } from "@/hooks/usePaymentStatus";
+import { useState } from "react";
 
 const IdeaDetails = ({ user }: { user: IUser | null }) => {
   const queryClient = useQueryClient();
@@ -40,6 +41,7 @@ const IdeaDetails = ({ user }: { user: IUser | null }) => {
     id,
     !!user,
   );
+  const [isVerifying, setIsVerifying] = useState(false);
 
   const isPaid = paymentStatus?.data === true;
 
@@ -60,17 +62,23 @@ const IdeaDetails = ({ user }: { user: IUser | null }) => {
   useEffect(() => {
     let interval: NodeJS.Timeout;
 
-    // If payment is successful but content is still hidden, poll for updates
-    if (isPaid && idea?.isHidden) {
+    // Poll if user is verifying payment OR if payment is recorded but content is still hidden
+    if ((isVerifying || isPaid) && idea?.isHidden) {
       interval = setInterval(async () => {
-        await Promise.all([refetchIdea(), refetchPayment()]);
+        const payRes = await refetchPayment();
+
+        // Stop verifying once backend confirms payment is COMPLETED
+        if (payRes.data?.data === true) {
+          await refetchIdea();
+          setIsVerifying(false);
+        }
       }, 2000);
     }
 
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [isPaid, idea?.isHidden, refetchIdea, refetchPayment]);
+  }, [isPaid, isVerifying, idea?.isHidden, refetchIdea, refetchPayment]);
 
   // LOADING UI
   if (isLoading) {
@@ -189,7 +197,7 @@ const IdeaDetails = ({ user }: { user: IUser | null }) => {
                   <Button variant="secondary">Register</Button>
                 </Link>
               </div>
-            ) : isPaid ? (
+            ) : (isPaid || isVerifying) ? (
               <div className="py-6 flex flex-col items-center gap-3 text-amber-600 font-medium">
                 <Loader2 className="h-10 w-10 animate-spin" />
                 <p>Payment confirmed! Unlocking your content...</p>
@@ -199,10 +207,14 @@ const IdeaDetails = ({ user }: { user: IUser | null }) => {
               <PaymentForm
                 ideaId={idea.id}
                 onSuccess={async () => {
-                  toast.success("Processing payment...");
-                  // Invalidate immediately to show the spinner
+                  toast.success("Payment successful! Verifying...");
+                  setIsVerifying(true);
+                  // Invalidate immediately to trigger the first poll
                   queryClient.invalidateQueries({
                     queryKey: ["payment-status", id],
+                  });
+                  queryClient.invalidateQueries({
+                    queryKey: ["idea", id],
                   });
                 }}
               />

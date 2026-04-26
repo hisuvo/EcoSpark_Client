@@ -63,29 +63,21 @@ export const loginAction = async (
       throw error;
     }
 
-    if (axios.isAxiosError(error)) {
-      const errorMessage = error.response?.data?.message || "Login failed";
-      const userEmail = payload.email;
-
-      // Check if email is not verified - redirect to verify page
-      if (
-        errorMessage.toLowerCase().includes("email") &&
-        (errorMessage.toLowerCase().includes("not verify") ||
-          errorMessage.toLowerCase().includes("verify") ||
-          errorMessage.toLowerCase().includes("verified"))
-      ) {
-        redirect(`/verify-email?email=${userEmail}`);
-      }
-
-      return {
-        success: false,
-        message: errorMessage,
-      };
+    const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred";
+    
+    // Check if email is not verified - redirect to verify page
+    if (
+      errorMessage.toLowerCase().includes("email") &&
+      (errorMessage.toLowerCase().includes("not verify") ||
+        errorMessage.toLowerCase().includes("verify") ||
+        errorMessage.toLowerCase().includes("verified"))
+    ) {
+      redirect(`/verify-email?email=${payload.email}`);
     }
+
     return {
       success: false,
-      message:
-        error instanceof Error ? error.message : "An unexpected error occurred",
+      message: errorMessage,
     };
   }
 };

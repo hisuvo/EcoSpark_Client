@@ -9,7 +9,7 @@ export const getPaymentStatus = async (ideaId: string) => {
     return res;
   } catch (error: any) {
     throw new Error(
-      error?.response?.data?.message || "Failed to fetch payment status",
+      error instanceof Error ? error.message : "Failed to fetch payment status"
     );
   }
 };
@@ -23,7 +23,7 @@ export const createPaymentIntent = async (ideaId: string) => {
     );
     return res;
   } catch (error: any) {
-    throw new Error(error?.response?.data?.message || "Payment intent failed");
+    throw new Error(error instanceof Error ? error.message : "Payment intent failed");
   }
 };
 

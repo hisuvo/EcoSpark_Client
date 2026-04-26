@@ -49,9 +49,11 @@ const httpGet = async <TData>(
     });
 
     return response.data;
-  } catch (error) {
+  } catch (error: any) {
     logHttpError("get", endPoint, error);
-    throw error;
+    throw new Error(
+      error?.response?.data?.message || error.message || "Failed to fetch data",
+    );
   }
 };
 
@@ -68,9 +70,11 @@ const httpPost = async <TData>(
     });
 
     return response.data;
-  } catch (error) {
+  } catch (error: any) {
     logHttpError("Post", endPoint, error);
-    throw error;
+    throw new Error(
+      error?.response?.data?.message || error.message || "Request failed",
+    );
   }
 };
 
@@ -87,9 +91,11 @@ const httpPut = async <TData>(
     });
 
     return response.data;
-  } catch (error) {
+  } catch (error: any) {
     logHttpError("Put", endPoint, error);
-    throw error;
+    throw new Error(
+      error?.response?.data?.message || error.message || "Request failed",
+    );
   }
 };
 
@@ -106,9 +112,11 @@ const httpPatch = async <TData>(
     });
 
     return response.data;
-  } catch (error) {
+  } catch (error: any) {
     logHttpError("Patch", endPoint, error);
-    throw error;
+    throw new Error(
+      error?.response?.data?.message || error.message || "Request failed",
+    );
   }
 };
 
@@ -124,9 +132,11 @@ const httpDelete = async <TData>(
     });
 
     return response.data;
-  } catch (error) {
+  } catch (error: any) {
     logHttpError("Delete", endPoint, error);
-    throw error;
+    throw new Error(
+      error?.response?.data?.message || error.message || "Request failed",
+    );
   }
 };
 
