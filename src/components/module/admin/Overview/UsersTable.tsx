@@ -68,15 +68,21 @@ const UsersTable: React.FC<UsersTableProps> = ({ users, isLoading }) => {
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-1.5 capitalize">
-                    {user.role === "admin" && (
+                    {(user.role === "ADMIN" || user.role === "admin") && (
                       <Shield className="h-3 w-3 text-primary" />
                     )}
-                    <span className="text-sm">{user.role}</span>
+                    <span className="text-sm lowercase first-letter:capitalize">
+                      {user.role}
+                    </span>
                   </div>
                 </TableCell>
                 <TableCell>
                   <Badge
-                    variant={user.status === "active" ? "default" : "secondary"}
+                    variant={
+                      user.status === "ACTIVE" || user.status === "active"
+                        ? "default"
+                        : "secondary"
+                    }
                     className="capitalize text-[10px] px-2 py-0"
                   >
                     {user.status}

@@ -9,12 +9,20 @@ import {
 } from "@/type/category.type";
 
 export const getCategories = async (params?: Record<string, unknown>) => {
-  const response = await httpClient.get<ApiResponse<ICategory[]>>(
-    "/categories",
-    { params },
-  );
-
-  return response.data;
+  try {
+    const response = await httpClient.get<ApiResponse<ICategory[]>>(
+      "/categories",
+      { params },
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching categories:", error);
+    return {
+      success: false,
+      message: "Failed to fetch categories",
+      data: [],
+    };
+  }
 };
 
 export const createCategory = async (params: ICategoryCreatePayload) => {

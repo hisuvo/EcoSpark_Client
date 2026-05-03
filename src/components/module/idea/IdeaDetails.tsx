@@ -103,8 +103,10 @@ const IdeaDetails = ({ user }: { user: IUser | null }) => {
     );
   }
 
-  // LOCK LOGIC
-  const isLocked = idea?.isHidden || (idea.isPaid && !user);
+  // ACCESS CONTROL LOGIC
+  const isAuthor = user && idea && user.id === idea.authorId;
+  const isAdmin = user && user.role === "ADMIN";
+  const isLocked = idea?.isHidden && !isAuthor && !isAdmin;
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">

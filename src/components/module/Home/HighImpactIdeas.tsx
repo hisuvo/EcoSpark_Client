@@ -18,6 +18,9 @@ export default function HighImpactIdeas() {
   });
 
   if (isLoading) return <FeaturedIdeasSkeleton />;
+  if (isError) {
+    console.error("Failed to fetch high impact ideas");
+  }
 
   const ideas = data?.data ?? [];
 

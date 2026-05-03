@@ -34,8 +34,7 @@ export const categoryIcons: Record<string, any> = {
 
 const Categories = async () => {
   const categoryList = await getCategories();
-  const categorie = categoryList?.data;
-  console.log(categorie);
+  const categorie = categoryList?.data || [];
   return (
     <section className="py-24 bg-muted/20 relative overflow-hidden">
       {/* Decorative background elements */}

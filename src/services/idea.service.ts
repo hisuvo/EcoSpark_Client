@@ -49,7 +49,7 @@ export const getIdeaById = async (id: string) => {
     return response;
   } catch (error) {
     console.error("Error fetching idea by id:", error);
-    throw error;
+    return null;
   }
 };
 
@@ -59,7 +59,7 @@ export const createIdea = async (payload: ICreateIdeaPayload) => {
     return response;
   } catch (error) {
     console.error("Error creating idea:", error);
-    throw error;
+    return { success: false, message: "Failed to create idea" };
   }
 };
 

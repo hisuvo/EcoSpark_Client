@@ -18,6 +18,9 @@ export default function Testimonials() {
   if (isLoading) {
     return <CommunityFavoritesSkeleton />;
   }
+  if (isError) {
+    console.error("Failed to fetch community favorites");
+  }
 
   const topIdeas = data?.data ?? [];
 

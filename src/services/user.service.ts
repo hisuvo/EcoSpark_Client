@@ -5,8 +5,18 @@ import { httpClient } from "@/lib/axios/apiClient";
 import { IUser } from "@/type/user.type";
 
 export const getAllUsers = async (params?: Record<string, unknown>) => {
-  const response = await httpClient.get<IUser[]>("/users", { params });
-  return response;
+  try {
+    const response = await httpClient.get<IUser[]>("/users", { params });
+    return response;
+  } catch (error) {
+    console.error("Error fetching all users:", error);
+    return {
+      success: false,
+      message: "Failed to fetch users",
+      data: [],
+      meta: { total: 0, page: 1, limit: 10, totalPages: 0 },
+    };
+  }
 };
 
 export const getAdminStats = async () => {

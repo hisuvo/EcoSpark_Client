@@ -19,6 +19,9 @@ export default function FeaturedIdeas() {
   });
 
   if (isLoading) return <FeaturedIdeasSkeleton />;
+  if (isError) {
+    console.error("Failed to fetch featured ideas");
+  }
 
   const ideas = data?.data ?? [];
 

@@ -10,27 +10,36 @@ const logHttpError = (method: string, endPoint: string, error: unknown) => {
       `[API Error] ${method.toUpperCase()} to ${endPoint} failed:`,
       {
         status: error.response?.status,
+        statusText: error.response?.statusText,
         message: error.message,
         data: error.response?.data,
-        url: error.config?.url,
+        url: error.config?.url || endPoint,
+        code: error.code,
       },
     );
   } else {
     console.error(
       `[API Error] Non-Axios error during ${method} to ${endPoint}:`,
-      error,
+      error instanceof Error
+        ? { message: error.message, stack: error.stack }
+        : error,
     );
   }
 };
 
 const axiosInstance = async () => {
-  const cookieStore = await cookies();
-  const accessToken = cookieStore.get("accessToken")?.value;
-
-  const cookieHeader = cookieStore
-    .getAll()
-    .map((cookie) => `${cookie.name}=${cookie.value}`)
-    .join("; ");
+  let cookieHeader = "";
+  try {
+    const cookieStore = await cookies();
+    cookieHeader = cookieStore
+      .getAll()
+      .map((cookie) => `${cookie.name}=${cookie.value}`)
+      .join("; ");
+  } catch (error) {
+    // In build time or static generation, cookies() may throw. 
+    // We swallow this as there's no session to pass anyway.
+    console.warn("[API Client] Cookies not available in current context.");
+  }
 
   const instance = axios.create({
     baseURL: API_BASE_URL || "http://localhost:5000/api/v1",
@@ -40,8 +49,6 @@ const axiosInstance = async () => {
       Cookie: cookieHeader,
     },
   });
-
-  console.log(`[API Request] Instance created with baseURL: ${API_BASE_URL}`);
 
   return instance;
 };
