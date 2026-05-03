@@ -12,7 +12,7 @@
 ## 🌐 Live URLs
 
 - **Frontend Application**: [https://ecospark-client-seven.vercel.app](https://ecospark-client-seven.vercel.app)
-- **Backend API**: [https://ecospark-hub-backend.vercel.app](https://ecospark-hub-backend.vercel.app)
+- **Backend API**: [https://eco-speark-hub.vercel.app](https://eco-speark-hub.vercel.app) (Production API Endpoint)
 
 ---
 
@@ -49,22 +49,28 @@
 Follow these steps to get your local development environment up and running:
 
 ### 1. Clone the Repository
+
 ```bash
 git clone https://github.com/your-username/ecospark-client.git
 cd ecospark-client
 ```
 
 ### 2. Install Dependencies
+
 ```bash
 pnpm install
 ```
 
 ### 3. Environment Configuration
+
 Create a `.env.local` file in the root directory based on `.env.example`:
+
 ```bash
 cp .env.example .env.local
 ```
+
 Fill in the required credentials:
+
 ```env
 NEXT_PUBLIC_API_URL=https://ecospark-hub-backend.vercel.app/api/v1
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
@@ -72,9 +78,11 @@ NEXT_PUBLIC_IMGBB_API_KEY=your_key
 ```
 
 ### 4. Run the Development Server
+
 ```bash
 pnpm dev
 ```
+
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 ---
@@ -89,4 +97,3 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 ---
 
 Developed with ❤️ for a Greener Future.
-
