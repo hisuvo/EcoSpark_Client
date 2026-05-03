@@ -9,7 +9,6 @@ import { setTokenCookie } from "@/lib/tokenUtils";
 import { LoginResponse, LoginSuccessResponse } from "@/type/auth.type";
 import { UserRole } from "@/type/role.type";
 import { ILoginPayload } from "@/zod/auth.validation";
-import axios from "axios";
 import { redirect } from "next/navigation";
 
 export const loginAction = async (
@@ -63,8 +62,9 @@ export const loginAction = async (
       throw error;
     }
 
-    const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred";
-    
+    const errorMessage =
+      error instanceof Error ? error.message : "An unexpected error occurred";
+
     // Check if email is not verified - redirect to verify page
     if (
       errorMessage.toLowerCase().includes("email") &&

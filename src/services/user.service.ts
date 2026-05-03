@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
 import { httpClient } from "@/lib/axios/apiClient";
@@ -21,8 +22,8 @@ export const getAdminStats = async () => {
         totalUsers: 0,
         totalIdeas: 0,
         totalPayments: 0,
-        recentActivity: []
-      }
+        recentActivity: [],
+      },
     };
   }
 };

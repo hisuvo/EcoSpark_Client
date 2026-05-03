@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
 import { httpClient } from "@/lib/axios/apiClient";
@@ -14,16 +15,31 @@ export const getIdeas = async (
   params?: Record<string, unknown>,
 ): Promise<IIdeaResponse> => {
   try {
-    const response = await httpClient.get<ApiResponse<IIdea[]>>("/ideas", {
+    const response = await httpClient.get<any>("/ideas", {
       params,
     });
-    return {
-      data: response.data.data,
-      meta: response.data.meta,
+
+    const ideas = response.data?.data || [];
+    const meta = response.data?.meta || {
+      total: 0,
+      page: 1,
+      limit: 10,
     };
-  } catch (error) {
-    console.error("Error fetching ideas:", error);
-    throw error;
+
+    return {
+      data: Array.isArray(ideas) ? ideas : [],
+      meta,
+    };
+  } catch (error: any) {
+    console.error(
+      "Critical error in getIdeas service:",
+      error.message || error,
+    );
+
+    return {
+      data: [],
+      meta: { total: 0, page: 1, limit: 10 },
+    };
   }
 };
 

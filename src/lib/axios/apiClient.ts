@@ -1,18 +1,25 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from "axios";
 import { API_BASE_URL } from "../constants";
 import { ApiRequestOptions, ApiResponse } from "@/type/api.type";
-import { cookies, headers } from "next/headers";
-import { isTokenExpiringSoon } from "../tokenUtils";
-
+import { cookies } from "next/headers";
 
 const logHttpError = (method: string, endPoint: string, error: unknown) => {
   if (axios.isAxiosError(error)) {
-    console.error(`${method} request to ${endPoint} failed`, {
-      status: error.response?.status,
-      message: error.message,
-      response: error.response?.data,
-    });
-    return;
+    console.error(
+      `[API Error] ${method.toUpperCase()} to ${endPoint} failed:`,
+      {
+        status: error.response?.status,
+        message: error.message,
+        data: error.response?.data,
+        url: error.config?.url,
+      },
+    );
+  } else {
+    console.error(
+      `[API Error] Non-Axios error during ${method} to ${endPoint}:`,
+      error,
+    );
   }
 };
 
@@ -26,13 +33,15 @@ const axiosInstance = async () => {
     .join("; ");
 
   const instance = axios.create({
-    baseURL: API_BASE_URL,
+    baseURL: API_BASE_URL || "http://localhost:5000/api/v1",
     withCredentials: true,
     headers: {
       "Content-Type": "application/json",
       Cookie: cookieHeader,
     },
   });
+
+  console.log(`[API Request] Instance created with baseURL: ${API_BASE_URL}`);
 
   return instance;
 };

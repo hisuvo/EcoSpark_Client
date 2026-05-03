@@ -78,7 +78,7 @@ export const getUserInfo = async () => {
     });
 
     if (!res.ok) {
-      console.error("Failed to fetch user info:", res.status, res.statusText);
+      // console.error("Failed to fetch user info:", res.status, res.statusText);
       return null;
     }
 

@@ -6,9 +6,10 @@ import { ArrowRight } from "lucide-react";
 import IdeaCard from "../idea/IdeaCard";
 import FeaturedIdeasSkeleton from "./FeaturedIdeasSkeleton";
 import { useIdeas } from "@/hooks/useIdeas";
+import SectionHeader from "@/components/shared/SectionHeader";
+import { Sparkles } from "lucide-react";
 
 export default function FeaturedIdeas() {
-  //pass params to hook (server-side filtering)
   const { data, isLoading, isError } = useIdeas({
     limit: 6,
     page: 1,
@@ -19,48 +20,59 @@ export default function FeaturedIdeas() {
 
   if (isLoading) return <FeaturedIdeasSkeleton />;
 
-  if (isError) {
-    return (
-      <div className="text-center py-20 text-destructive">
-        Failed to load featured ideas
-      </div>
-    );
-  }
-
   const ideas = data?.data ?? [];
 
   return (
-    <section className="py-16 bg-background">
+    <section className="py-24 bg-background">
       <div className="container mx-auto px-4">
         {/* Header */}
-        <div className="text-center mb-10">
-          <h2 className="text-3xl font-bold mb-3">Featured Ideas</h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            Discover the latest sustainability ideas from our community members
-          </p>
-        </div>
+        <SectionHeader
+          badge="Innovation Hub"
+          badgeIcon={Sparkles}
+          title={
+            <>
+              Featured <span className="text-primary">Sustainable</span> Ideas
+            </>
+          }
+          description="Explore the latest and most innovative solutions shared by our global community of eco-innovators."
+          className="mb-0"
+        />
 
-        {/* Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {ideas.map((idea) => (
-            <IdeaCard key={idea.id} idea={idea} />
-          ))}
-        </div>
+        {/* Grid or Empty State */}
+        {ideas.length > 0 ? (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {ideas.map((idea) => (
+                <IdeaCard key={idea.id} idea={idea} />
+              ))}
+            </div>
 
-        {/* CTA */}
-        <div className="text-center mt-8">
-          <Button
-            asChild
-            variant="outline"
-            size="lg"
-            className="border-green-600 text-green-600 hover:bg-green-50 dark:hover:bg-green-950/50"
-          >
-            <Link href="/ideas">
-              View All Ideas
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
-          </Button>
-        </div>
+            {/* CTA */}
+            <div className="text-center mt-16">
+              <Button
+                asChild
+                size="lg"
+                variant="outline"
+                className="rounded-full border-2 border-primary text-primary hover:bg-primary hover:text-white px-8 transition-all duration-300"
+              >
+                <Link href="/ideas" className="flex items-center">
+                  Browse All Ideas
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
+          </>
+        ) : (
+          <div className="text-center py-20 bg-muted/10 rounded-3xl border border-border">
+            <div className="text-5xl mb-4">🌟</div>
+            <h3 className="text-xl font-semibold mb-2">
+              No Featured Ideas Found
+            </h3>
+            <p className="text-muted-foreground">
+              We are waiting for the next big sustainable idea to be shared.
+            </p>
+          </div>
+        )}
       </div>
     </section>
   );
