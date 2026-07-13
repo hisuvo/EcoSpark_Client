@@ -13,6 +13,7 @@ import { Separator } from "@/components/ui/separator";
 import { Calendar, Mail, Shield, User } from "lucide-react";
 import { format } from "date-fns";
 import { IUser } from "@/type/user.type";
+import UpdateProfileModal from "@/components/module/Dashboard/UpdateUserProfile";
 
 interface UserProfileProps {
   user: IUser;
@@ -41,6 +42,7 @@ const Profile = ({ user }: UserProfileProps) => {
             >
               {user.status}
             </Badge>
+            <UpdateProfileModal />
           </div>
         </CardHeader>
 

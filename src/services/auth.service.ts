@@ -13,6 +13,11 @@ import {
 
 import { performHeadlessTokenRefresh } from "@/lib/auth/refresh-token";
 
+export interface UpdateProfilePayload {
+  name: string;
+  image?: string;
+}
+
 export const getNewTokenWithRefreshToken = async (refreshToken: string) => {
   try {
     const cookieStore = await cookies();
@@ -89,6 +94,12 @@ export const getUserInfo = async () => {
     console.error("Error fetching user info:", error);
     return null;
   }
+};
+
+export const updateProfile = async (data: UpdateProfilePayload) => {
+  const response = await httpClient.put("/auth/me", data);
+
+  return response.data;
 };
 
 export const changePasswordService = async (payload: {
