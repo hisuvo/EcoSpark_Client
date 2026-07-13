@@ -56,6 +56,33 @@ export default function LoginForm({ redirectpath }: LoginFormProps) {
     <Card className="max-w-md mx-auto my-10 border p-6 rounded-lg">
       <CardTitle className="text-xl font-semibold mb-4">Login</CardTitle>
 
+      {/* user and admin demo credentials */}
+      <div className="flex justify-center gap-2">
+        <Button
+          size="sm"
+          variant="outline"
+          type="button"
+          onClick={() => {
+            form.setFieldValue("email", "suvodatta72@gmail.com");
+            form.setFieldValue("password", "password_1234");
+          }}
+        >
+          Admin
+        </Button>
+
+        <Button
+          size="sm"
+          variant="outline"
+          type="button"
+          onClick={() => {
+            form.setFieldValue("email", "suvodatta@gmail.com");
+            form.setFieldValue("password", "password_1234");
+          }}
+        >
+          Use
+        </Button>
+      </div>
+
       <CardContent>
         <form
           method="POST"
