@@ -10,27 +10,7 @@ import {
 import SectionHeader from "@/components/shared/SectionHeader";
 import { getCategories } from "@/services/categories.service";
 
-import {
-  Leaf,
-  Droplets,
-  Recycle,
-  Tractor,
-  Building2,
-  Lightbulb,
-  Users,
-  Globe,
-} from "lucide-react";
-
-export const categoryIcons: Record<string, any> = {
-  "Green Technology": Leaf,
-  "Water Conservation": Droplets,
-  "Plastic Management": Recycle,
-  "Sustainable Agriculture": Tractor,
-  "Urban Planning": Building2,
-  "Climate Awareness": Globe,
-  "Community Development": Users,
-  Elictrycity: Lightbulb,
-};
+import { Globe } from "lucide-react";
 
 const Categories = async () => {
   const categoryList = await getCategories();
@@ -67,24 +47,39 @@ const Categories = async () => {
           >
             <CarouselContent className="-ml-4">
               {categorie.map((cat, index) => {
-                const Icon = categoryIcons[cat.name] || Leaf;
                 return (
                   <CarouselItem
                     key={index}
-                    className="pl-4 md:basis-1/2 lg:basis-1/4 xl:basis-1/5"
+                    className="pl-4 md:basis-1/1 lg:basis-1/2 xl:basis-1/3"
                   >
-                    <div className="p-8 rounded-3xl bg-card border border-border/50 hover:border-primary/50 hover:shadow-xl hover:shadow-primary/5 transition-all duration-500 cursor-pointer group text-center flex flex-col items-center h-full">
-                      <div
-                        className={`w-20 h-20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-sm`}
-                      >
-                        <Icon className="w-10 h-10 text-green-300" />
-                        {/* <Icon className="w-5 h-5 text-green-600" /> */}
+                    {/* <div className="p-8 rounded-3xl bg-card border border-green-300 hover:border-primary/50 hover:shadow-xl hover:shadow-primary/5 transition-all duration-500 cursor-pointer group text-center flex flex-col items-center h-full">
+                      <div className="mt-auto">
+                        <span className="inline-flex items-center px-3 py-1 rounded-full bg-muted text-[10px] font-bold text-muted-foreground uppercase tracking-widest group-hover:bg-primary group-hover:text-primary-foreground transition-colors duration-300">
+                          {cat._count?.ideas ?? 0} Active Ideas
+                        </span>
                       </div>
+
                       <h3 className="font-bold text-lg mb-2 line-clamp-1">
                         {cat.name}
                       </h3>
+
+                      <p>{cat.description?.slice(0, 100)}...</p>
+                    </div> */}
+
+                    <div className="p-8 rounded-3xl bg-card border border-green-300 hover:border-primary/50 hover:shadow-xl hover:shadow-primary/5 transition-all duration-500 cursor-pointer group text-center flex flex-col items-center h-full">
+                      {/* Category Name */}
+                      <h3 className="font-bold text-xl mb-3 line-clamp-1 group-hover:text-primary transition-colors">
+                        {cat.name}
+                      </h3>
+
+                      {/* Description */}
+                      <p className="text-sm text-muted-foreground leading-6 line-clamp-3 mb-6">
+                        {cat.description}
+                      </p>
+
+                      {/* Active Ideas Badge */}
                       <div className="mt-auto">
-                        <span className="inline-flex items-center px-3 py-1 rounded-full bg-muted text-[10px] font-bold text-muted-foreground uppercase tracking-widest group-hover:bg-primary group-hover:text-primary-foreground transition-colors duration-300">
+                        <span className="inline-flex items-center rounded-full bg-muted px-4 py-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground transition-all duration-300 group-hover:bg-primary group-hover:text-primary-foreground">
                           {cat._count?.ideas ?? 0} Active Ideas
                         </span>
                       </div>
